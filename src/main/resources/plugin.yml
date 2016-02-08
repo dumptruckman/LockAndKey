@@ -1,0 +1,4 @@
+name: LockAndKey
+main: com.dumptruckman.lockandkey.LockAndKeyPlugin
+version: maven-version-number
+softdepend: [Magic,MagicLib]
