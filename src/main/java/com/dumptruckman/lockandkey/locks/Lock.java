@@ -27,20 +27,13 @@ import java.util.*;
 @NoTypeKey
 public final class Lock {
 
-    private static final String LOCK_CODE = ChatColor.COLOR_CHAR + "*";
-    private static final List<String> LOCK_LORE;
-    static {
-        LOCK_LORE = new ArrayList<>(2);
-        LOCK_LORE.add(ChatColor.WHITE + "Only usable by owner");
-        LOCK_LORE.add(ChatColor.WHITE + "or designated friends");
-    }
-
     private LockLocation location;
     @Nullable
     private LockLocation connectedLocation = null;
     private LockMaterial lockMaterial;
     private UUID ownerId;
     private boolean locked = false;
+    private String keyCode = null;
     private Set<UUID> whiteListedPlayers = new HashSet<>();
 
     private Lock() { }
@@ -110,46 +103,12 @@ public final class Lock {
         return lockMaterial;
     }
 
-    public static boolean isItemLockable(@NotNull ItemStack item) {
-        return LockMaterial.getByItemMaterial(item.getType()) != null;
+    public boolean hasKeyCode() {
+        return keyCode != null && !keyCode.isEmpty();
     }
 
-    public static boolean isLockedItem(@NotNull ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        if (!meta.hasDisplayName()) {
-            return false;
-        }
-        String displayName = meta.getDisplayName();
-        return displayName.length() > 3 && displayName.endsWith(LOCK_CODE);
-    }
-
-    public static ItemStack createLockedItem(@NotNull LockMaterial material, int amount) {
-        ItemStack item = new ItemStack(material.getItemMaterial(), amount);
-        setEncodedLockName(item);
-        return item;
-    }
-
-    private static ItemStack setEncodedLockName(@NotNull ItemStack itemToName) {
-        LockMaterial lockMaterial = LockMaterial.getByItemMaterial(itemToName.getType());
-        if (lockMaterial == null) {
-            throw new IllegalArgumentException("Item type '" + itemToName.getType() + "' is not lockable");
-        }
-
-        String itemName;
-        ItemMeta meta = itemToName.getItemMeta();
-
-        if (meta.hasDisplayName()) {
-            itemName = meta.getDisplayName();
-        } else {
-            itemName = ChatColor.WHITE + lockMaterial.getItemName();
-        }
-        itemName = ChatColor.AQUA + "Locked " + itemName + LOCK_CODE;
-        meta.setDisplayName(itemName);
-        meta.setLore(LOCK_LORE);
-        meta.addEnchant(Enchantment.LUCK, 1, true);
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        itemToName.setItemMeta(meta);
-        return itemToName;
+    public boolean isCorrectKeyCode(@NotNull String keyCode) {
+        return this.keyCode != null && this.keyCode.equals(keyCode);
     }
 
     @Override

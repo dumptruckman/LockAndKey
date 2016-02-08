@@ -3,7 +3,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-package com.dumptruckman.lockandkey.locks.recipe;
+package com.dumptruckman.lockandkey.listeners;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.locks.LockDust;
@@ -15,15 +15,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-public class Recipes implements Listener {
-
-    private static final ItemMeta DUST_COMPARISON = LockDust.createLockDust(1).getItemMeta();
-    private static final ItemMeta BLOCK_COMPARISON = LockDust.createDustBlock(1).getItemMeta();
+public class RecipeListener implements Listener {
 
     @NotNull
     private final LockAndKeyPlugin plugin;
 
-    public Recipes(@NotNull final LockAndKeyPlugin plugin) {
+    public RecipeListener(@NotNull final LockAndKeyPlugin plugin) {
         this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -41,12 +38,11 @@ public class Recipes implements Listener {
             if (matrix[i] == null) {
                 return;
             }
-            ItemMeta meta = matrix[i].getItemMeta();
-            if (!meta.hasDisplayName() || !meta.getDisplayName().equals(DUST_COMPARISON.getDisplayName())) {
+            if (!plugin.isDustItem(matrix[i])) {
                 return;
             }
         }
-        event.getInventory().setResult(LockDust.createDustBlock(1));
+        event.getInventory().setResult(plugin.createDustBlock(1));
     }
 
     @EventHandler
@@ -57,12 +53,26 @@ public class Recipes implements Listener {
         ItemStack[] matrix = event.getInventory().getMatrix();
         for (ItemStack item : matrix) {
             if (item != null && item.getType() == Material.REDSTONE_BLOCK) {
-                ItemMeta meta = item.getItemMeta();
-                if (!meta.hasDisplayName() || !meta.getDisplayName().equals(BLOCK_COMPARISON.getDisplayName())) {
+                if (!plugin.isDustItem(item)) {
                     return;
                 }
             }
         }
-        event.getInventory().setResult(LockDust.createLockDust(9));
+        event.getInventory().setResult(plugin.createSealingDust(9));
+    }
+
+    @EventHandler
+    public void lockRecipe(PrepareItemCraftEvent event) {
+        if (!plugin.getExampleLockItems().contains(event.getRecipe().getResult())) {
+            return;
+        }
+        ItemStack[] matrix = event.getInventory().getMatrix();
+        for (ItemStack item : matrix) {
+            if (item != null && item.getType() == Material.REDSTONE) {
+                if (!plugin.isDustItem(item)) {
+                    event.getInventory().setResult(null);
+                }
+            }
+        }
     }
 }

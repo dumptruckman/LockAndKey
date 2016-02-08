@@ -6,7 +6,6 @@
 package com.dumptruckman.lockandkey.commands;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
-import com.dumptruckman.lockandkey.locks.Lock;
 import com.dumptruckman.lockandkey.locks.LockMaterial;
 import com.dumptruckman.lockandkey.util.Perms;
 import org.bukkit.ChatColor;
@@ -85,10 +84,11 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
             return false;
         }
 
-        ItemStack lockItem = Lock.createLockedItem(material, amount);
+        ItemStack lockItem = getPlugin().createLockItem(material, amount);
+        String itemName = lockItem.getItemMeta().getDisplayName();
         player.getInventory().addItem(lockItem);
         player.updateInventory();
-        sender.sendMessage("Gave " + ChatColor.GOLD + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + ChatColor.AQUA + " Locked " + material.getItemName());
+        sender.sendMessage("Gave " + ChatColor.GOLD + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + itemName);
         return true;
     }
 

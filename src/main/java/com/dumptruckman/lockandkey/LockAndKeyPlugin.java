@@ -6,16 +6,22 @@
 package com.dumptruckman.lockandkey;
 
 import com.dumptruckman.lockandkey.commands.GiveLockCommand;
-import com.dumptruckman.lockandkey.locks.recipe.Recipes;
+import com.dumptruckman.lockandkey.listeners.DustListener;
+import com.dumptruckman.lockandkey.listeners.RecipeListener;
+import com.dumptruckman.lockandkey.locks.Lock;
+import com.dumptruckman.lockandkey.locks.LockMaterial;
+import com.dumptruckman.lockandkey.locks.Recipes;
 import com.dumptruckman.lockandkey.util.Log;
 import com.dumptruckman.lockandkey.commands.GiveDustCommand;
 import com.dumptruckman.lockandkey.listeners.LockListener;
 import com.dumptruckman.lockandkey.locks.LockRegistry;
-import net.milkbowl.vault.permission.Permission;
+import com.elmakers.mine.bukkit.utility.CompatibilityUtils;
+import com.elmakers.mine.bukkit.utility.InventoryUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import pluginbase.bukkit.BukkitPluginAgent;
@@ -23,26 +29,32 @@ import pluginbase.plugin.PluginBase;
 import pluginbase.plugin.Settings;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class LockAndKeyPlugin extends JavaPlugin {
 
+    private static final String LOCKABLE_NODE_NAME = "lockable";
+    private static final String DUST_NODE_NAME = "dust";
+    private static final String KEY_NODE_NAME = "keye";
+    private static final String KEY_CODE_KEY = "keycode";
+
     private final BukkitPluginAgent<LockAndKeyPlugin> pluginAgent = BukkitPluginAgent.getPluginAgent(LockAndKeyPlugin.class, this, "lak");
 
-    private Permission permission;
     private LockRegistry lockRegistry;
+    private Recipes recipes = new Recipes(this);
+
+    private Set<ItemStack> exampleLockItems;
 
     public LockAndKeyPlugin() {
         pluginAgent.setDefaultSettingsCallable(new Callable<Settings>() {
             @Override
             public Settings call() throws Exception {
-                return new LockAndKeyConfig(getPluginBase());
+                return new PluginConfig(getPluginBase());
             }
         });
         pluginAgent.setPermissionPrefix("lockandkey");
-
     }
 
     private PluginBase getPluginBase() {
@@ -61,13 +73,16 @@ public class LockAndKeyPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Check for Magic
+
         pluginAgent.enablePluginBase();
 
-        // Setup vault permissions
-        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-        if (permissionProvider != null) {
-            permission = permissionProvider.getProvider();
+        exampleLockItems = new LinkedHashSet<>(LockMaterial.values().length);
+        for (LockMaterial material : LockMaterial.values()) {
+            exampleLockItems.add(createLockItem(material, 1));
         }
+        int recipesLoaded = recipes.loadRecipes();
+        Log.info("Loaded " + recipesLoaded + " recipes.");
 
         try {
             lockRegistry = new LockRegistry(this);
@@ -79,12 +94,13 @@ public class LockAndKeyPlugin extends JavaPlugin {
         }
 
         new LockListener(this);
-        new Recipes(this);
+        new RecipeListener(this);
+        new DustListener(this);
     }
 
     @NotNull
-    public LockAndKeyConfig getSettings() {
-        return (LockAndKeyConfig) getPluginBase().getSettings();
+    public PluginConfig getSettings() {
+        return (PluginConfig) getPluginBase().getSettings();
     }
 
     @Override
@@ -105,16 +121,90 @@ public class LockAndKeyPlugin extends JavaPlugin {
         return pluginAgent.callCommand(sender, command, label, args);
     }
 
-    private static final Set<Material> TRANSPARENT = new HashSet<>(1);
-    static {
-        TRANSPARENT.add(Material.AIR);
-    }
-
     public LockRegistry getLockRegistry() {
         return lockRegistry;
     }
 
-    public Permission getPermission() {
-        return permission;
+    public Set<ItemStack> getExampleLockItems() {
+        return exampleLockItems;
+    }
+
+    public ItemStack createLockItem(@NotNull LockMaterial material, int amount) {
+        ItemStack item = new ItemStack(material.getItemMaterial(), amount);
+        item = InventoryUtils.makeReal(item);
+
+        CompatibilityUtils.setLore(item, getSettings().getLocks().getLockableLore());
+        CompatibilityUtils.addGlow(item);
+        CompatibilityUtils.setDisplayName(item, ChatColor.AQUA + "Lockable " + ChatColor.WHITE + material.getItemName());
+
+        InventoryUtils.createNode(item, LOCKABLE_NODE_NAME);
+
+        return item;
+    }
+
+    public boolean isLockItem(@NotNull ItemStack item) {
+        return InventoryUtils.getNode(item, LOCKABLE_NODE_NAME) != null;
+    }
+
+    public ItemStack createSealingDust(int amount) {
+        ItemStack item = new ItemStack(Material.REDSTONE, amount);
+        item = InventoryUtils.makeReal(item);
+
+        CompatibilityUtils.setLore(item, getSettings().getLocks().getDustLore());
+        CompatibilityUtils.addGlow(item);
+        CompatibilityUtils.setDisplayName(item, ChatColor.GOLD + getSettings().getLocks().getDustName());
+
+        InventoryUtils.createNode(item, DUST_NODE_NAME);
+
+        return item;
+    }
+
+    public ItemStack createDustBlock(int amount) {
+        ItemStack item = new ItemStack(Material.REDSTONE_BLOCK, amount);
+        item = InventoryUtils.makeReal(item);
+
+        CompatibilityUtils.setLore(item, getSettings().getLocks().getDustBlockLore());
+        CompatibilityUtils.addGlow(item);
+        CompatibilityUtils.setDisplayName(item, ChatColor.GOLD + getSettings().getLocks().getDustBlockName());
+
+        InventoryUtils.createNode(item, DUST_NODE_NAME);
+
+        return item;
+    }
+
+    public boolean isDustItem(@NotNull ItemStack item) {
+        return InventoryUtils.getNode(item, DUST_NODE_NAME) != null;
+    }
+
+    public ItemStack createBlankKeyItem(int amount) {
+        ItemStack item = new ItemStack(Material.TRIPWIRE_HOOK, amount);
+        item = InventoryUtils.makeReal(item);
+
+        CompatibilityUtils.setLore(item, getSettings().getLocks().getUncutKeyLore());
+        CompatibilityUtils.addGlow(item);
+        CompatibilityUtils.setDisplayName(item, ChatColor.GOLD + "Uncut Key");
+
+        InventoryUtils.createNode(item, KEY_NODE_NAME);
+
+        return item;
+    }
+
+    public boolean isKeyItem(@NotNull ItemStack item) {
+        return InventoryUtils.getNode(item, KEY_NODE_NAME) != null;
+    }
+
+    public boolean isBlankKey(@NotNull ItemStack item) {
+        String keyCode = getKeyCode(item);
+        return keyCode == null || keyCode.isEmpty();
+    }
+
+    public String getKeyCode(@NotNull ItemStack item) {
+        Object keyNode = InventoryUtils.getNode(item, KEY_NODE_NAME);
+        return InventoryUtils.getMeta(keyNode, KEY_CODE_KEY);
+    }
+
+    public boolean isKeyCompatible(@NotNull ItemStack item, @NotNull Lock lock) {
+        String keyCode = getKeyCode(item);
+        return keyCode != null && lock.isCorrectKeyCode(keyCode);
     }
 }

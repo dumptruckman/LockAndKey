@@ -15,6 +15,8 @@ public class Perms {
             .commandPermission().usePluginName().build();
     public static final BukkitPerm CMD_GIVEDUST = BukkitPermFactory.newBukkitPerm(LockAndKeyPlugin.class, "cmd.givedust")
             .commandPermission().usePluginName().build();
+    public static final BukkitPerm CMD_GIVEKEY = BukkitPermFactory.newBukkitPerm(LockAndKeyPlugin.class, "cmd.givekey")
+            .commandPermission().usePluginName().build();
 
     public static final BukkitPerm BYPASS_LOCKS = BukkitPermFactory.newBukkitPerm(LockAndKeyPlugin.class, "bypass.locks")
             .usePluginName().build();

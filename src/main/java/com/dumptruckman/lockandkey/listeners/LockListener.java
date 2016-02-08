@@ -48,7 +48,7 @@ public class LockListener implements Listener {
         if (item == null) {
             return;
         }
-        if (!Lock.isLockedItem(item)) {
+        if (!plugin.isLockItem(item)) {
             return;
         }
         Lock lock = getLockRegistry().createLock(event.getBlock(), event.getPlayer());
@@ -68,8 +68,13 @@ public class LockListener implements Listener {
             return;
         }
 
-        if (player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            toggleLock(player, lock);
+        ItemStack itemInHand = player.getItemInHand();
+        if (player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK
+                && itemInHand != null && itemInHand.getType() == Material.TRIPWIRE_HOOK
+                && plugin.isKeyItem(itemInHand)) {
+            fitKey(player, lock, itemInHand);
+            event.setCancelled(true);
+            event.setUseInteractedBlock(Event.Result.DENY);
             return;
         }
 
@@ -77,8 +82,12 @@ public class LockListener implements Listener {
             return;
         }
 
-        if (lock.isLocked()) {
-        //if (!lock.isUsableBy(player)) {
+        if (!plugin.getSettings().getLocks().isKeyRequiredForOwner() && lock.isOwner(player.getUniqueId())){
+            return;
+        }
+
+        if (itemInHand == null || itemInHand.getType() != Material.TRIPWIRE_HOOK
+                || !plugin.isKeyCompatible(itemInHand, lock)) {
             OfflinePlayer lockOwner = lock.getOwner();
             if (lockOwner == null) {
                 Log.info("Removing orphaned lock: " + lock);
@@ -88,6 +97,26 @@ public class LockListener implements Listener {
             event.setCancelled(true);
             event.setUseInteractedBlock(Event.Result.DENY);
             ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "That " + lock.getLockMaterial().getItemName() + " is locked by " + lockOwner.getName());
+        }
+    }
+
+    private void fitKey(@NotNull Player player, @NotNull Lock lock, @NotNull ItemStack itemInHand) {
+        if (!lock.isOwner(player.getUniqueId())) {
+            ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "You must be the owner to configure the lock!");
+            return;
+        }
+        if (plugin.isBlankKey(itemInHand)) {
+            if (lock.hasKeyCode()) {
+                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "Key has been cut to existing lock!");
+            } else {
+                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "Key has been cut to new lock!");
+            }
+        } else {
+            if (lock.hasKeyCode()) {
+                ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "This door already uses a different key.");
+            } else {
+                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "New lock installed for this key!");
+            }
         }
     }
 
@@ -188,7 +217,7 @@ public class LockListener implements Listener {
             }
         }
         block.setType(Material.AIR);
-        block.getWorld().dropItemNaturally(block.getLocation(), Lock.createLockedItem(lock.getLockMaterial(), 1));
+        block.getWorld().dropItemNaturally(block.getLocation(), plugin.createLockItem(lock.getLockMaterial(), 1));
         return true;
     }
 }
