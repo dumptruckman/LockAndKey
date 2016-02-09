@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package com.dumptruckman.lockandkey.locks;
 
+import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.util.Log;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -33,7 +34,7 @@ import java.util.concurrent.Future;
 public class LockRegistry {
 
     @NotNull
-    private final Plugin plugin;
+    private final LockAndKeyPlugin plugin;
 
     @NotNull
     private final DataSource locksDataSource;
@@ -43,7 +44,7 @@ public class LockRegistry {
 
     private BukkitTask saveTask;
 
-    public LockRegistry(@NotNull Plugin plugin) throws IOException {
+    public LockRegistry(@NotNull LockAndKeyPlugin plugin) throws IOException {
         this.plugin = plugin;
         File locksDataFolder = new File(plugin.getDataFolder(), "data");
         locksDataFolder.mkdirs();
@@ -52,6 +53,10 @@ public class LockRegistry {
             locksDataFile.createNewFile();
         }
         locksDataSource = HoconDataSource.builder().setFile(locksDataFile).setCommentsEnabled(false).build();
+    }
+
+    LockAndKeyPlugin getPlugin() {
+        return plugin;
     }
 
     public void loadLocks() {
@@ -63,7 +68,7 @@ public class LockRegistry {
                     lockStore = new LockStore();
                     locksDataSource.save(lockStore);
                 }
-                return lockStore.loadData();
+                return lockStore.loadData(LockRegistry.this);
             } catch (SendablePluginBaseException e) {
                 e.printStackTrace();
                 Log.severe("No locks were loaded!");
@@ -134,11 +139,11 @@ public class LockRegistry {
         if (lockMaterial == null) {
             throw new IllegalArgumentException("Invalid lock material: " + block.getType());
         }
-        Lock lock = new Lock(block, owner);
+        Lock lock = new Lock(this, block, owner);
         lock.setKeyCode(keyCode);
         lockedBlocks.put(lock.getLocation(), lock);
         if (lock.isDoor()) {
-            Lock topLock = new Lock(block.getRelative(BlockFace.UP), owner);
+            Lock topLock = new Lock(this, block.getRelative(BlockFace.UP), owner);
             topLock.setKeyCode(keyCode);
             lockedBlocks.put(topLock.getLocation(), topLock);
         }

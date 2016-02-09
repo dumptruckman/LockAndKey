@@ -7,6 +7,7 @@ package com.dumptruckman.lockandkey.listeners;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.locks.LockDust;
+import com.dumptruckman.lockandkey.util.ItemHelper;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,10 +36,7 @@ public class RecipeListener implements Listener {
             return;
         }
         for (int i = 0; i < 9; i++) {
-            if (matrix[i] == null) {
-                return;
-            }
-            if (!plugin.isDustItem(matrix[i])) {
+            if (!ItemHelper.isDustItem(matrix[i])) {
                 return;
             }
         }
@@ -51,14 +49,19 @@ public class RecipeListener implements Listener {
             return;
         }
         ItemStack[] matrix = event.getInventory().getMatrix();
-        for (ItemStack item : matrix) {
-            if (item != null && item.getType() == Material.REDSTONE_BLOCK) {
-                if (!plugin.isDustItem(item)) {
-                    return;
-                }
+        boolean found = false;
+        for (int i = 0; i < matrix.length - 1; i++) {
+            if (matrix[i] == null) {
+                continue;
             }
+            if (!ItemHelper.isDustBlockItem(matrix[i])) {
+                return;
+            }
+            found = true;
         }
-        event.getInventory().setResult(plugin.createSealingDust(9));
+        if (found) {
+            event.getInventory().setResult(plugin.createSealingDust(9));
+        }
     }
 
     @EventHandler
@@ -69,7 +72,7 @@ public class RecipeListener implements Listener {
         ItemStack[] matrix = event.getInventory().getMatrix();
         for (ItemStack item : matrix) {
             if (item != null && item.getType() == Material.REDSTONE) {
-                if (!plugin.isDustItem(item)) {
+                if (!ItemHelper.isDustItem(item)) {
                     event.getInventory().setResult(null);
                 }
             }

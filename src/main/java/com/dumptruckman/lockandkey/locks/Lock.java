@@ -5,11 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package com.dumptruckman.lockandkey.locks;
 
+import com.dumptruckman.lockandkey.LockAndKeyPlugin;
+import com.dumptruckman.lockandkey.PluginSettings.Locks;
+import com.dumptruckman.lockandkey.util.ItemHelper;
+import com.dumptruckman.lockandkey.util.Log;
+import com.elmakers.mine.bukkit.utility.CompatibilityUtils;
+import com.elmakers.mine.bukkit.utility.InventoryUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.NotNull;
@@ -21,19 +29,20 @@ import java.util.*;
 @NoTypeKey
 public final class Lock {
 
+    private transient LockRegistry registry;
+
     private LockLocation location;
     @Nullable
     private LockLocation connectedLocation = null;
     private LockMaterial lockMaterial;
     private UUID ownerId;
-    private boolean locked = false;
     @Nullable
     private String keyCode = null;
-    private Set<UUID> whiteListedPlayers = new HashSet<>();
 
     private Lock() { }
 
-    Lock(@NotNull Block block, @NotNull Player owner) {
+    Lock(@NotNull LockRegistry lockRegistry, @NotNull Block block, @NotNull Player owner) {
+        this.registry = lockRegistry;
         this.location = new LockLocation(block);
         this.lockMaterial = LockMaterial.getByBlockMaterial(block.getType());
         if (lockMaterial == null) {
@@ -49,6 +58,25 @@ public final class Lock {
             }
         }
         this.ownerId = owner.getUniqueId();
+    }
+
+    void setRegistry(@NotNull LockRegistry registry) {
+        this.registry = registry;
+    }
+
+    private LockRegistry getRegistry() {
+        return registry;
+    }
+
+    private LockAndKeyPlugin getPlugin() {
+        if (registry == null) {
+            throw new IllegalStateException("Somehow this Lock was not set up correctly!");
+        }
+        return registry.getPlugin();
+    }
+
+    private Locks getLockSettings() {
+        return getPlugin().getSettings().getLocks();
     }
 
     public LockLocation getLocation() {
@@ -85,7 +113,7 @@ public final class Lock {
         return keyCode != null && !keyCode.isEmpty();
     }
 
-    public boolean isCorrectKeyCode(@NotNull String keyCode) {
+    public boolean isCorrectKeyCode(@Nullable String keyCode) {
         return this.keyCode != null && this.keyCode.equals(keyCode);
     }
 
@@ -96,6 +124,58 @@ public final class Lock {
 
     public void setKeyCode(@Nullable String keyCode) {
         this.keyCode = keyCode;
+    }
+
+    public ItemStack createLockItem(int amount) {
+        ItemStack item = getPlugin().createLockItem(getLockMaterial(), amount);
+        return ItemHelper.setKeyCode(item, getKeyCode());
+    }
+
+    public boolean isKeyCompatible(@NotNull ItemStack item) {
+        String keyCode = ItemHelper.getKeyCode(item);
+        return isCorrectKeyCode(keyCode);
+    }
+
+    /**
+     * Turns the key into a key for this lock.
+     *
+     * @param key the item that represents the key.
+     */
+    public void cutKey(@NotNull ItemStack key) {
+        if (!ItemHelper.isKeyItem(key)) {
+            throw new IllegalArgumentException("Item must represent a key.");
+        }
+        String keyCode = getKeyCode();
+        if (keyCode == null) {
+            throw new IllegalArgumentException("The lock must have a key code first.");
+        }
+
+        List<String> lore = new ArrayList<>(getLockSettings().getKeyLore());
+        if (getLockSettings().isLockCodeVisible()) {
+            lore.add(ChatColor.GRAY.toString() + ChatColor.ITALIC.toString() + keyCode);
+        }
+
+        ItemHelper.builder(key)
+                .setName(ChatColor.GOLD + "Key")
+                .setLore(lore)
+                .addGlow()
+                .setKeyCode(keyCode).buildItem();
+    }
+
+    /**
+     * Changes this lock to use the given key.
+     *
+     * @param key the key this lock will be set to work with.
+     */
+    public void useNewKey(@NotNull ItemStack key) {
+        if (!ItemHelper.isKeyItem(key)) {
+            throw new IllegalArgumentException("Item must represent a key.");
+        }
+        String keyCode = ItemHelper.getKeyCode(key);
+        if (keyCode == null || keyCode.isEmpty()) {
+            throw new IllegalArgumentException("Item must represent a cut key.");
+        }
+        setKeyCode(keyCode);
     }
 
     @Override

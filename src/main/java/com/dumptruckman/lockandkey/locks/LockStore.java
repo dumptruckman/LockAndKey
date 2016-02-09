@@ -19,9 +19,10 @@ final class LockStore {
     List<Lock> lockData = new ArrayList<>();
 
     @NotNull
-    Map<LockLocation, Lock> loadData() {
+    Map<LockLocation, Lock> loadData(@NotNull LockRegistry registry) {
         Map<LockLocation, Lock> map = new HashMap<>(lockData.size());
         for (Lock lock : lockData) {
+            lock.setRegistry(registry);
             map.put(lock.getLocation(), lock);
         }
         return map;

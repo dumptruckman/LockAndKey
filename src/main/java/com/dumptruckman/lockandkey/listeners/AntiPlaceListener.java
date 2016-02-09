@@ -6,7 +6,9 @@
 package com.dumptruckman.lockandkey.listeners;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
+import com.dumptruckman.lockandkey.util.ItemHelper;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -26,15 +28,9 @@ public class AntiPlaceListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void preventPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
-        if (item == null) {
-            return;
-        }
-        if ((item.getType() == Material.REDSTONE || item.getType() == Material.REDSTONE_BLOCK)
-                && plugin.isDustItem(item)) {
-            event.setCancelled(true);
-            return;
-        }
-        if (item.getType() == Material.TRIPWIRE_HOOK && plugin.isKeyItem(item)) {
+        if (ItemHelper.isDustItem(item)
+                || ItemHelper.isDustBlockItem(item)
+                || ItemHelper.isKeyItem(item)) {
             event.setCancelled(true);
         }
     }
