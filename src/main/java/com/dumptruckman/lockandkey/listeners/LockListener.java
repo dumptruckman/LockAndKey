@@ -11,9 +11,11 @@ import com.dumptruckman.lockandkey.locks.LockLocation;
 import com.dumptruckman.lockandkey.locks.LockRegistry;
 import com.dumptruckman.lockandkey.util.ActionBarUtil;
 import com.dumptruckman.lockandkey.util.Log;
+import com.dumptruckman.lockandkey.util.Perms;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -51,7 +53,7 @@ public class LockListener implements Listener {
         if (!plugin.isLockItem(item)) {
             return;
         }
-        Lock lock = getLockRegistry().createLock(event.getBlock(), event.getPlayer());
+        Lock lock = getLockRegistry().createLock(event.getBlock(), event.getPlayer(), plugin.getKeyCode(item));
         event.getPlayer().sendMessage(ChatColor.AQUA + "You placed a Locked " + lock.getLockMaterial().getItemName() + "!");
     }
 
@@ -82,6 +84,10 @@ public class LockListener implements Listener {
             return;
         }
 
+        if (Perms.BYPASS_LOCKS.hasPermission(player)) {
+            return;
+        }
+
         if (!plugin.getSettings().getLocks().isKeyRequiredForOwner() && lock.isOwner(player.getUniqueId())){
             return;
         }
@@ -97,6 +103,7 @@ public class LockListener implements Listener {
             event.setCancelled(true);
             event.setUseInteractedBlock(Event.Result.DENY);
             ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "That " + lock.getLockMaterial().getItemName() + " is locked by " + lockOwner.getName());
+            player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ZOMBIE_WOOD, .2F, 1F);
         }
     }
 
@@ -106,39 +113,24 @@ public class LockListener implements Listener {
             return;
         }
         if (plugin.isBlankKey(itemInHand)) {
+            if (itemInHand.getAmount() > 1) {
+                ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "You can only cut one key at a time!");
+                return;
+            }
             if (lock.hasKeyCode()) {
+                plugin.configureKeyToLock(itemInHand, lock);
                 ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "Key has been cut to existing lock!");
             } else {
+                lock.setKeyCode(plugin.createRandomizedKeyCode());
+                plugin.configureKeyToLock(itemInHand, lock);
                 ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "Key has been cut to new lock!");
             }
         } else {
             if (lock.hasKeyCode()) {
                 ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "This door already uses a different key.");
             } else {
+                plugin.configureLockToKey(lock, itemInHand);
                 ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "New lock installed for this key!");
-            }
-        }
-    }
-
-    private void toggleLock(@NotNull Player player, @NotNull Lock lock) {
-        if (lock.isOwner(player.getUniqueId())) {
-            boolean locked = lock.isLocked();
-            setLocked(lock, !locked);
-            if (locked) {
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "You unlocked the " + lock.getLockMaterial().getItemName());
-            } else {
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "You locked the " + lock.getLockMaterial().getItemName());
-            }
-        }
-    }
-
-    private void setLocked(@NotNull Lock lock, boolean locked) {
-        lock.setLocked(locked);
-        LockLocation connectedLocation = lock.getConnectedLocation();
-        if (connectedLocation != null) {
-            Lock connectedLock = getLockRegistry().getLock(connectedLocation);
-            if (connectedLock != null) {
-                connectedLock.setLocked(locked);
             }
         }
     }
@@ -217,7 +209,7 @@ public class LockListener implements Listener {
             }
         }
         block.setType(Material.AIR);
-        block.getWorld().dropItemNaturally(block.getLocation(), plugin.createLockItem(lock.getLockMaterial(), 1));
+        block.getWorld().dropItemNaturally(block.getLocation(), plugin.createLockItem(lock, 1));
         return true;
     }
 }

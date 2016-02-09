@@ -129,15 +129,17 @@ public class LockRegistry {
     }
 
     @NotNull
-    public Lock createLock(@NotNull Block block, @NotNull Player owner) {
+    public Lock createLock(@NotNull Block block, @NotNull Player owner, @Nullable String keyCode) {
         LockMaterial lockMaterial = LockMaterial.getByBlockMaterial(block.getType());
         if (lockMaterial == null) {
             throw new IllegalArgumentException("Invalid lock material: " + block.getType());
         }
         Lock lock = new Lock(block, owner);
+        lock.setKeyCode(keyCode);
         lockedBlocks.put(lock.getLocation(), lock);
         if (lock.isDoor()) {
             Lock topLock = new Lock(block.getRelative(BlockFace.UP), owner);
+            topLock.setKeyCode(keyCode);
             lockedBlocks.put(topLock.getLocation(), topLock);
         }
         return lock;

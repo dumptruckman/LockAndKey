@@ -36,17 +36,19 @@ public final class PluginConfig extends Settings {
         @Comment({"How often to save lock data (in ticks).", "1200 ticks is approximately 1 minute"})
         private long saveTicks = 1200L;
         @Comment({"Whether the other must have a key to open their own locks", "False means that the owner can lock/unlock without a key."})
-        private boolean ownerRequiresKey = false;
+        private boolean keyRequiredForOwner = false;
         @Comment({"The name of the lock creation ingredient (Redstone)"})
         private String dustName = "Sealing Dust";
         @Comment({"The name of the lock creation ingredient block (Redstone Block)"})
         private String dustBlockName = "Concentrated Sealing Dust";
 
-        @Comment({"This is the item description of lockable items (doors, buttons, etc)"})
-        private List<String> lockableLore;
+        @Comment({"This is the item description of locked items (doors, buttons, etc)"})
+        private List<String> lockLore;
         {
-            lockableLore = new ArrayList<>();
-            lockableLore.add("This item is lockable when placed.");
+            lockLore = new ArrayList<>();
+            lockLore.add("This item is locked when placed.");
+            lockLore.add("It can only be opened by the owner");
+            lockLore.add("or anyone with a key.");
         }
 
         @Comment({"This is the item description of the Sealing Dust"})
@@ -72,8 +74,15 @@ public final class PluginConfig extends Settings {
         {
             uncutKeyLore = new ArrayList<>();
             uncutKeyLore.add("This key can be cut to fit any lock.");
-            uncutKeyLore.add("Sneak right click the lockable block");
+            uncutKeyLore.add("Sneak right click the locked block");
             uncutKeyLore.add("to configure this key for that block.");
+        }
+
+        @Comment({"This is the item description of an (cut) Key"})
+        private List<String> keyLore;
+        {
+            keyLore = new ArrayList<>();
+            keyLore.add("This key unlocks something somewhere...");
         }
 
         @Comment({"Whether or not to show the lock code as the last line of the item lore of items"})
@@ -90,7 +99,7 @@ public final class PluginConfig extends Settings {
         }
 
         public boolean isKeyRequiredForOwner() {
-            return ownerRequiresKey;
+            return keyRequiredForOwner;
         }
 
         public String getDustName() {
@@ -101,8 +110,8 @@ public final class PluginConfig extends Settings {
             return dustBlockName;
         }
 
-        public List<String> getLockableLore() {
-            return lockableLore;
+        public List<String> getLockLore() {
+            return lockLore;
         }
 
         public List<String> getDustLore() {
@@ -115,6 +124,10 @@ public final class PluginConfig extends Settings {
 
         public List<String> getUncutKeyLore() {
             return uncutKeyLore;
+        }
+
+        public List<String> getKeyLore() {
+            return keyLore;
         }
 
         public String getLockCodeCharacters() {

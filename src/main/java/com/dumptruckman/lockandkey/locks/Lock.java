@@ -5,17 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package com.dumptruckman.lockandkey.locks;
 
-import com.dumptruckman.lockandkey.util.Perms;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +27,7 @@ public final class Lock {
     private LockMaterial lockMaterial;
     private UUID ownerId;
     private boolean locked = false;
+    @Nullable
     private String keyCode = null;
     private Set<UUID> whiteListedPlayers = new HashSet<>();
 
@@ -77,23 +72,6 @@ public final class Lock {
         return Bukkit.getOfflinePlayer(ownerId);
     }
 
-    public boolean isOnWhiteList(@NotNull UUID playerId) {
-        return whiteListedPlayers.contains(playerId);
-    }
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-
-    public boolean isUsableBy(@NotNull Player player) {
-        UUID playerId = player.getUniqueId();
-        return isOwner(playerId) || isOnWhiteList(playerId) || Perms.BYPASS_LOCKS.hasPermission(player);
-    }
-
     @Nullable
     public LockLocation getConnectedLocation() {
         return connectedLocation;
@@ -109,6 +87,15 @@ public final class Lock {
 
     public boolean isCorrectKeyCode(@NotNull String keyCode) {
         return this.keyCode != null && this.keyCode.equals(keyCode);
+    }
+
+    @Nullable
+    public String getKeyCode() {
+        return this.keyCode;
+    }
+
+    public void setKeyCode(@Nullable String keyCode) {
+        this.keyCode = keyCode;
     }
 
     @Override

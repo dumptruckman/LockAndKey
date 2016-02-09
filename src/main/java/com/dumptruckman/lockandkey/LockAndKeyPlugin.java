@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package com.dumptruckman.lockandkey;
 
+import com.dumptruckman.lockandkey.commands.GiveKeyCommand;
 import com.dumptruckman.lockandkey.commands.GiveLockCommand;
 import com.dumptruckman.lockandkey.listeners.DustListener;
 import com.dumptruckman.lockandkey.listeners.RecipeListener;
@@ -24,23 +25,27 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import pluginbase.bukkit.BukkitPluginAgent;
 import pluginbase.plugin.PluginBase;
-import pluginbase.plugin.Settings;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 public class LockAndKeyPlugin extends JavaPlugin {
 
-    private static final String LOCKABLE_NODE_NAME = "lockable";
-    private static final String DUST_NODE_NAME = "dust";
-    private static final String KEY_NODE_NAME = "keye";
-    private static final String KEY_CODE_KEY = "keycode";
+    private static final String LOCK_NODE_NAME = "lockNode";
+    private static final String DUST_NODE_NAME = "dustNode";
+    private static final String KEY_NODE_NAME = "keyNode";
+    private static final String KEY_CODE_KEY = "keyCode";
 
     private final BukkitPluginAgent<LockAndKeyPlugin> pluginAgent = BukkitPluginAgent.getPluginAgent(LockAndKeyPlugin.class, this, "lak");
+
+    private final Random random = new Random(System.currentTimeMillis());
 
     private LockRegistry lockRegistry;
     private Recipes recipes = new Recipes(this);
@@ -48,12 +53,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
     private Set<ItemStack> exampleLockItems;
 
     public LockAndKeyPlugin() {
-        pluginAgent.setDefaultSettingsCallable(new Callable<Settings>() {
-            @Override
-            public Settings call() throws Exception {
-                return new PluginConfig(getPluginBase());
-            }
-        });
+        pluginAgent.setDefaultSettingsCallable(() -> new PluginConfig(getPluginBase()));
         pluginAgent.setPermissionPrefix("lockandkey");
     }
 
@@ -69,12 +69,11 @@ public class LockAndKeyPlugin extends JavaPlugin {
         // Register commands
         pluginAgent.registerCommand(GiveLockCommand.class);
         pluginAgent.registerCommand(GiveDustCommand.class);
+        pluginAgent.registerCommand(GiveKeyCommand.class);
     }
 
     @Override
     public void onEnable() {
-        // Check for Magic
-
         pluginAgent.enablePluginBase();
 
         exampleLockItems = new LinkedHashSet<>(LockMaterial.values().length);
@@ -133,17 +132,24 @@ public class LockAndKeyPlugin extends JavaPlugin {
         ItemStack item = new ItemStack(material.getItemMaterial(), amount);
         item = InventoryUtils.makeReal(item);
 
-        CompatibilityUtils.setLore(item, getSettings().getLocks().getLockableLore());
+        CompatibilityUtils.setLore(item, getSettings().getLocks().getLockLore());
         CompatibilityUtils.addGlow(item);
-        CompatibilityUtils.setDisplayName(item, ChatColor.AQUA + "Lockable " + ChatColor.WHITE + material.getItemName());
+        CompatibilityUtils.setDisplayName(item, ChatColor.AQUA + "Locked " + ChatColor.WHITE + material.getItemName());
 
-        InventoryUtils.createNode(item, LOCKABLE_NODE_NAME);
+        InventoryUtils.createNode(item, LOCK_NODE_NAME);
 
         return item;
     }
 
+    public ItemStack createLockItem(@NotNull Lock lock, int amount) {
+        ItemStack item = createLockItem(lock.getLockMaterial(), amount);
+        Object lockNode = InventoryUtils.createNode(item, LOCK_NODE_NAME);
+        InventoryUtils.setMeta(lockNode, KEY_CODE_KEY, lock.getKeyCode());
+        return item;
+    }
+
     public boolean isLockItem(@NotNull ItemStack item) {
-        return InventoryUtils.getNode(item, LOCKABLE_NODE_NAME) != null;
+        return InventoryUtils.getNode(item, LOCK_NODE_NAME) != null;
     }
 
     public ItemStack createSealingDust(int amount) {
@@ -198,6 +204,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
         return keyCode == null || keyCode.isEmpty();
     }
 
+    @Nullable
     public String getKeyCode(@NotNull ItemStack item) {
         Object keyNode = InventoryUtils.getNode(item, KEY_NODE_NAME);
         return InventoryUtils.getMeta(keyNode, KEY_CODE_KEY);
@@ -206,5 +213,46 @@ public class LockAndKeyPlugin extends JavaPlugin {
     public boolean isKeyCompatible(@NotNull ItemStack item, @NotNull Lock lock) {
         String keyCode = getKeyCode(item);
         return keyCode != null && lock.isCorrectKeyCode(keyCode);
+    }
+
+    public String createRandomizedKeyCode() {
+        String keyCharacters = getSettings().getLocks().getLockCodeCharacters();
+        int lockCodeLength = getSettings().getLocks().getLockCodeLength();
+        StringBuilder code = new StringBuilder(lockCodeLength);
+        for (int i = 0; i < lockCodeLength; i++) {
+            code.append(keyCharacters.charAt(random.nextInt(keyCharacters.length())));
+        }
+        return code.toString();
+    }
+
+    public void configureKeyToLock(@NotNull ItemStack key, @NotNull Lock lock) {
+        String keyCode = lock.getKeyCode();
+        if (keyCode == null) {
+            throw new IllegalArgumentException("The lock must have a key code first.");
+        }
+        Object keyNode = InventoryUtils.getNode(key, KEY_NODE_NAME);
+        if (keyNode == null) {
+            throw new IllegalArgumentException("Item must represent a key.");
+        }
+        InventoryUtils.setMeta(keyNode, KEY_CODE_KEY, keyCode);
+        List<String> lore = new ArrayList<>(getSettings().getLocks().getKeyLore());
+        if (getSettings().getLocks().isLockCodeVisible()) {
+            lore.add(ChatColor.GRAY.toString() + ChatColor.ITALIC.toString() + keyCode);
+        }
+        CompatibilityUtils.setLore(key, lore);
+        CompatibilityUtils.addGlow(key);
+        CompatibilityUtils.setDisplayName(key, ChatColor.GOLD + "Key");
+    }
+
+    public void configureLockToKey(@NotNull Lock lock, @NotNull ItemStack key) {
+        Object keyNode = InventoryUtils.getNode(key, KEY_NODE_NAME);
+        if (keyNode == null) {
+            throw new IllegalArgumentException("Item must represent a key.");
+        }
+        String keyCode = InventoryUtils.getMeta(keyNode, KEY_CODE_KEY);
+        if (keyCode == null || keyCode.isEmpty()) {
+            throw new IllegalArgumentException("Item must represent a cut key.");
+        }
+        lock.setKeyCode(keyCode);
     }
 }

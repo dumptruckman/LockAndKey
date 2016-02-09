@@ -79,7 +79,7 @@ public class GiveDustCommand extends Command<LockAndKeyPlugin> {
 
         player.getInventory().addItem(item);
         player.updateInventory();
-        sender.sendMessage("Gave " + ChatColor.GOLD + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + item.getItemMeta().getDisplayName());
+        sender.sendMessage("Gave " + ChatColor.GRAY + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + item.getItemMeta().getDisplayName());
         return true;
     }
 }

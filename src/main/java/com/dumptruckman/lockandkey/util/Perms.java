@@ -8,6 +8,7 @@ package com.dumptruckman.lockandkey.util;
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import pluginbase.bukkit.permission.BukkitPerm;
 import pluginbase.bukkit.permission.BukkitPermFactory;
+import pluginbase.permission.PermDefault;
 
 public class Perms {
 
@@ -19,6 +20,6 @@ public class Perms {
             .commandPermission().usePluginName().build();
 
     public static final BukkitPerm BYPASS_LOCKS = BukkitPermFactory.newBukkitPerm(LockAndKeyPlugin.class, "bypass.locks")
-            .usePluginName().build();
+            .usePluginName().def(PermDefault.FALSE).build();
 
 }

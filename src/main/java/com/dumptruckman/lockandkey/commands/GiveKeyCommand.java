@@ -76,7 +76,7 @@ public class GiveKeyCommand extends Command<LockAndKeyPlugin> {
         ItemStack lockDust = getPlugin().createBlankKeyItem(amount);
         player.getInventory().addItem(lockDust);
         player.updateInventory();
-        sender.sendMessage("Gave " + ChatColor.GOLD + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + lockDust.getItemMeta().getDisplayName());
+        sender.sendMessage("Gave " + ChatColor.GRAY + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + lockDust.getItemMeta().getDisplayName());
         return true;
     }
 }

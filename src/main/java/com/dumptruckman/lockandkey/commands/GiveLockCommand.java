@@ -88,7 +88,7 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
         String itemName = lockItem.getItemMeta().getDisplayName();
         player.getInventory().addItem(lockItem);
         player.updateInventory();
-        sender.sendMessage("Gave " + ChatColor.GOLD + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + itemName);
+        sender.sendMessage("Gave " + ChatColor.GRAY + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + itemName);
         return true;
     }
 
