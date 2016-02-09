@@ -7,6 +7,7 @@ package com.dumptruckman.lockandkey.locks;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.util.Log;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -144,14 +145,35 @@ public class LockRegistry {
         if (lock.isDoor()) {
             Lock topLock = new Lock(this, block.getRelative(BlockFace.UP), owner, keyCode);
             lockedBlocks.put(topLock.getLocation(), topLock);
+        } else if (lock.isChest()) {
+            setupConnectedChest(lock, block.getRelative(BlockFace.NORTH));
+            setupConnectedChest(lock, block.getRelative(BlockFace.SOUTH));
+            setupConnectedChest(lock, block.getRelative(BlockFace.EAST));
+            setupConnectedChest(lock, block.getRelative(BlockFace.WEST));
         }
         return lock;
+    }
+
+    private void setupConnectedChest(Lock lock, Block relative) {
+        if (relative.getType() == Material.CHEST) {
+            Lock connectedLock = getLock(relative);
+            if (connectedLock != null) {
+                lock.connectedLocation = connectedLock.getLocation();
+                lock.keyCode = connectedLock.keyCode;
+                connectedLock.connectedLocation = lock.getLocation();
+            }
+        }
     }
 
     public void removeLock(@NotNull Lock lock) {
         lockedBlocks.remove(lock.getLocation());
         if (lock.isDoor()) {
             lockedBlocks.remove(lock.getConnectedLocation());
+        } else if (lock.isChest()) {
+            Lock connectedLock = lock.getConnectedLock();
+            if (connectedLock != null) {
+                connectedLock.connectedLocation = null;
+            }
         }
     }
 

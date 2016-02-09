@@ -33,11 +33,11 @@ public final class Lock {
 
     private LockLocation location;
     @Nullable
-    private LockLocation connectedLocation = null;
+    LockLocation connectedLocation = null;
     private LockMaterial lockMaterial;
     private UUID ownerId;
     @Nullable
-    private String keyCode = null;
+    String keyCode = null;
 
     private Lock() { }
 
@@ -89,6 +89,10 @@ public final class Lock {
 
     public boolean isDoor() {
         return lockMaterial.isDoor();
+    }
+
+    public boolean isChest() {
+        return lockMaterial.isChest();
     }
 
     public boolean isOwner(@NotNull UUID playerId) {

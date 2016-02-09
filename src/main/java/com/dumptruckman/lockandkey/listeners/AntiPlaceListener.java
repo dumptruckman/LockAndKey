@@ -8,6 +8,8 @@ package com.dumptruckman.lockandkey.listeners;
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.util.ItemHelper;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,9 +30,35 @@ public class AntiPlaceListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void preventPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
+        /*
         if (ItemHelper.isDustItem(item)
                 || ItemHelper.isDustBlockItem(item)
                 || ItemHelper.isKeyItem(item)) {
+            event.setCancelled(true);
+        }
+        */
+        if (item == null || item.getType() != Material.CHEST) {
+            return;
+        }
+        boolean isLock = ItemHelper.isLockItem(item);
+        Block block = event.getBlock();
+        Block relative = block.getRelative(BlockFace.NORTH);
+        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
+            event.setCancelled(true);
+            return;
+        }
+        relative = block.getRelative(BlockFace.SOUTH);
+        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
+            event.setCancelled(true);
+            return;
+        }
+        relative = block.getRelative(BlockFace.EAST);
+        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
+            event.setCancelled(true);
+            return;
+        }
+        relative = block.getRelative(BlockFace.WEST);
+        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
             event.setCancelled(true);
         }
     }

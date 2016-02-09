@@ -13,9 +13,9 @@ import java.util.List;
 
 public class ItemHelper {
 
-    private static final String LOCK_NODE_NAME = "lockNode";
-    private static final String DUST_NODE_NAME = "dustNode";
-    private static final String KEY_NODE_NAME = "keyNode";
+    private static final String LOCK_NODE_NAME = "isLock";
+    private static final String DUST_NODE_NAME = "isDust";
+    private static final String KEY_NODE_NAME = "isKey";
     private static final String KEY_CODE_KEY = "keyCode";
 
     public static ItemHelper builder(@NotNull Material material, int amount) {
@@ -29,25 +29,25 @@ public class ItemHelper {
     @Contract("null -> false")
     public static boolean isLockItem(@Nullable ItemStack item) {
         return item != null && LockMaterial.getByItemMaterial(item.getType()) != null
-                && getNode(item, LOCK_NODE_NAME) != null;
+                && hasNode(item, LOCK_NODE_NAME);
     }
 
     @Contract("null -> false")
     public static boolean isDustItem(@Nullable ItemStack item) {
         return item != null && item.getType() == Material.REDSTONE
-                && getNode(item, DUST_NODE_NAME) != null;
+                && hasNode(item, DUST_NODE_NAME);
     }
 
     @Contract("null -> false")
     public static boolean isDustBlockItem(@Nullable ItemStack item) {
         return item != null && item.getType() == Material.REDSTONE_BLOCK
-                && getNode(item, DUST_NODE_NAME) != null;
+                && hasNode(item, DUST_NODE_NAME);
     }
 
     @Contract("null -> false")
     public static boolean isKeyItem(@Nullable ItemStack item) {
         return item != null && item.getType() == Material.TRIPWIRE_HOOK
-                && getNode(item, KEY_NODE_NAME) != null;
+                && hasNode(item, KEY_NODE_NAME);
     }
 
     public static boolean isBlankKeyItem(@NotNull ItemStack item) {
@@ -60,25 +60,24 @@ public class ItemHelper {
 
     @Nullable
     public static String getKeyCode(@NotNull ItemStack item) {
-        Object keyNode = InventoryUtils.getNode(item, KEY_NODE_NAME);
-        return InventoryUtils.getMeta(keyNode, KEY_CODE_KEY);
+        return InventoryUtils.getMeta(item, KEY_CODE_KEY);
     }
 
     public static ItemStack setKeyCode(@NotNull ItemStack item, @Nullable String keyCode) {
-        Object node = getNode(item, KEY_NODE_NAME);
-        if (node == null) {
-            throw new IllegalArgumentException("Item must represent key item.");
+        if (keyCode == null) {
+            InventoryUtils.removeMeta(item, KEY_CODE_KEY);
+        } else {
+            InventoryUtils.setMeta(item, KEY_CODE_KEY, keyCode);
         }
-        InventoryUtils.setMeta(node, KEY_CODE_KEY, keyCode);
         return item;
     }
 
-    private static Object createNode(@NotNull ItemStack item, @NotNull String nodeName) {
-        return InventoryUtils.createNode(item, nodeName);
+    private static void createNode(@NotNull ItemStack item, @NotNull String nodeName) {
+        InventoryUtils.setMeta(item, nodeName, "true");
     }
 
-    private static Object getNode(@NotNull ItemStack item, @NotNull String nodeName) {
-        return InventoryUtils.getNode(item, nodeName);
+    private static boolean hasNode(@NotNull ItemStack item, @NotNull String nodeName) {
+        return InventoryUtils.hasMeta(item, nodeName);
     }
 
     @NotNull
@@ -96,9 +95,9 @@ public class ItemHelper {
         }
     }
 
-    private Object createNode(@NotNull String nodeName) {
+    private void createNode(@NotNull String nodeName) {
         makeReal();
-        return createNode(item, nodeName);
+        createNode(item, nodeName);
     }
 
     public ItemHelper createLockData() {

@@ -42,7 +42,12 @@ public enum LockMaterial {
     DARK_OAK_FENCE_GATE(Material.DARK_OAK_FENCE_GATE),
     JUNGLE_FENCE_GATE(Material.JUNGLE_FENCE_GATE),
     SPRUCE_FENCE_GATE(Material.SPRUCE_FENCE_GATE),
-
+    CHEST(Material.CHEST) {
+        @Override
+        public boolean isChest() {
+            return true;
+        }
+    }
     ;
 
     private static final Map<Material, LockMaterial> itemLookupMap = new HashMap<>(LockMaterial.values().length);
@@ -116,6 +121,10 @@ public enum LockMaterial {
 
     public boolean isDoor() {
         return isDoor;
+    }
+
+    public boolean isChest() {
+        return false;
     }
 
     @NotNull

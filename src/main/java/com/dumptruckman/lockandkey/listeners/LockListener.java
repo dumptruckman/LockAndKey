@@ -122,7 +122,7 @@ public class LockListener implements Listener {
             }
         } else {
             if (lock.hasKeyCode()) {
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "This door already uses a different key.");
+                ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "This lock already uses a different key.");
             } else {
                 lock.useNewKey(itemInHand);
                 ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "New lock installed for this key!");

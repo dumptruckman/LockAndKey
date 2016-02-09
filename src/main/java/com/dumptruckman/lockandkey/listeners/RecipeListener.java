@@ -71,10 +71,8 @@ public class RecipeListener implements Listener {
         }
         ItemStack[] matrix = event.getInventory().getMatrix();
         for (ItemStack item : matrix) {
-            if (item != null && item.getType() == Material.REDSTONE) {
-                if (!ItemHelper.isDustItem(item)) {
-                    event.getInventory().setResult(null);
-                }
+            if (item != null && item.getType() == Material.REDSTONE && !ItemHelper.isDustItem(item)) {
+                event.getInventory().setResult(null);
             }
         }
     }
