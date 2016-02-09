@@ -15,15 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NoTypeKey
-public final class PluginConfig extends Settings {
+public final class PluginSettings extends Settings {
 
     private Locks locks = new Locks();
 
-    public PluginConfig(@NotNull PluginBase plugin) {
+    public PluginSettings(@NotNull PluginBase plugin) {
         super(plugin);
     }
 
-    private PluginConfig() {
+    private PluginSettings() {
     }
 
     public Locks getLocks() {

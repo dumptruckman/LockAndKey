@@ -13,26 +13,28 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class DustListener implements Listener {
+public class AntiPlaceListener implements Listener {
 
     @NotNull
     private final LockAndKeyPlugin plugin;
 
-    public DustListener(@NotNull final LockAndKeyPlugin plugin) {
+    public AntiPlaceListener(@NotNull final LockAndKeyPlugin plugin) {
         this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void placeDust(BlockPlaceEvent event) {
+    public void preventPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
         if (item == null) {
             return;
         }
-        if (item.getType() != Material.REDSTONE && item.getType() != Material.REDSTONE_BLOCK) {
+        if ((item.getType() == Material.REDSTONE || item.getType() == Material.REDSTONE_BLOCK)
+                && plugin.isDustItem(item)) {
+            event.setCancelled(true);
             return;
         }
-        if (plugin.isDustItem(item)) {
+        if (item.getType() == Material.TRIPWIRE_HOOK && plugin.isKeyItem(item)) {
             event.setCancelled(true);
         }
     }

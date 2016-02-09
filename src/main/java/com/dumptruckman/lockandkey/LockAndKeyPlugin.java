@@ -7,7 +7,7 @@ package com.dumptruckman.lockandkey;
 
 import com.dumptruckman.lockandkey.commands.GiveKeyCommand;
 import com.dumptruckman.lockandkey.commands.GiveLockCommand;
-import com.dumptruckman.lockandkey.listeners.DustListener;
+import com.dumptruckman.lockandkey.listeners.AntiPlaceListener;
 import com.dumptruckman.lockandkey.listeners.RecipeListener;
 import com.dumptruckman.lockandkey.locks.Lock;
 import com.dumptruckman.lockandkey.locks.LockMaterial;
@@ -53,7 +53,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
     private Set<ItemStack> exampleLockItems;
 
     public LockAndKeyPlugin() {
-        pluginAgent.setDefaultSettingsCallable(() -> new PluginConfig(getPluginBase()));
+        pluginAgent.setDefaultSettingsCallable(() -> new PluginSettings(getPluginBase()));
         pluginAgent.setPermissionPrefix("lockandkey");
     }
 
@@ -94,12 +94,12 @@ public class LockAndKeyPlugin extends JavaPlugin {
 
         new LockListener(this);
         new RecipeListener(this);
-        new DustListener(this);
+        new AntiPlaceListener(this);
     }
 
     @NotNull
-    public PluginConfig getSettings() {
-        return (PluginConfig) getPluginBase().getSettings();
+    public PluginSettings getSettings() {
+        return (PluginSettings) getPluginBase().getSettings();
     }
 
     @Override
