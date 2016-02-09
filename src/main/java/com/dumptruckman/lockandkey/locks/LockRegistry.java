@@ -39,7 +39,7 @@ public class LockRegistry {
     @NotNull
     private final DataSource locksDataSource;
 
-    private Map<LockLocation, Lock> lockedBlocks = new ConcurrentHashMap<>();
+    Map<LockLocation, Lock> lockedBlocks = new ConcurrentHashMap<>();
     private final ExecutorService dataWorker = Executors.newSingleThreadExecutor();
 
     private BukkitTask saveTask;
@@ -139,12 +139,10 @@ public class LockRegistry {
         if (lockMaterial == null) {
             throw new IllegalArgumentException("Invalid lock material: " + block.getType());
         }
-        Lock lock = new Lock(this, block, owner);
-        lock.setKeyCode(keyCode);
+        Lock lock = new Lock(this, block, owner, keyCode);
         lockedBlocks.put(lock.getLocation(), lock);
         if (lock.isDoor()) {
-            Lock topLock = new Lock(this, block.getRelative(BlockFace.UP), owner);
-            topLock.setKeyCode(keyCode);
+            Lock topLock = new Lock(this, block.getRelative(BlockFace.UP), owner, keyCode);
             lockedBlocks.put(topLock.getLocation(), topLock);
         }
         return lock;

@@ -41,7 +41,7 @@ public final class Lock {
 
     private Lock() { }
 
-    Lock(@NotNull LockRegistry lockRegistry, @NotNull Block block, @NotNull Player owner) {
+    Lock(@NotNull LockRegistry lockRegistry, @NotNull Block block, @NotNull Player owner, @Nullable String keyCode) {
         this.registry = lockRegistry;
         this.location = new LockLocation(block);
         this.lockMaterial = LockMaterial.getByBlockMaterial(block.getType());
@@ -105,6 +105,11 @@ public final class Lock {
         return connectedLocation;
     }
 
+    @Nullable
+    public Lock getConnectedLock() {
+        return connectedLocation != null ? registry.getLock(connectedLocation) : null;
+    }
+
     public LockMaterial getLockMaterial() {
         return lockMaterial;
     }
@@ -124,6 +129,10 @@ public final class Lock {
 
     public void setKeyCode(@Nullable String keyCode) {
         this.keyCode = keyCode;
+        Lock connectedLock = getConnectedLock();
+        if (connectedLock != null) {
+            getConnectedLock().keyCode = keyCode;
+        }
     }
 
     public ItemStack createLockItem(int amount) {
