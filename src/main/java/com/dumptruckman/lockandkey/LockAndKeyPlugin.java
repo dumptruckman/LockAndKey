@@ -5,6 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package com.dumptruckman.lockandkey;
 
+import com.dumptruckman.lockandkey.PluginSettings.LockSettings;
+import com.dumptruckman.lockandkey.PluginSettings.LockSettings.Descriptions;
 import com.dumptruckman.lockandkey.commands.GiveKeyCommand;
 import com.dumptruckman.lockandkey.commands.GiveLockCommand;
 import com.dumptruckman.lockandkey.listeners.AntiPlaceListener;
@@ -47,7 +49,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
         pluginAgent.setPermissionPrefix("lockandkey");
     }
 
-    private PluginBase getPluginBase() {
+    PluginBase getPluginBase() {
         return pluginAgent.getPluginBase();
     }
 
@@ -65,6 +67,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         pluginAgent.enablePluginBase();
+        Messages.setPlugin(this);
 
         try {
             lockRegistry = new LockRegistry(this);
@@ -94,11 +97,20 @@ public class LockAndKeyPlugin extends JavaPlugin {
         return (PluginSettings) getPluginBase().getSettings();
     }
 
+    public LockSettings getLockSettings() {
+        return getSettings().getLocks();
+    }
+
+    public Descriptions getItemDescriptions() {
+        return getLockSettings().getDescriptions();
+    }
+
     @Override
     public void onDisable() {
         getLockRegistry().stopSaveTask();
         getLockRegistry().saveLocks(true);
         pluginAgent.disablePluginBase();
+        Messages.setPlugin(null);
         Log.shutdown();
     }
 
@@ -123,7 +135,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
     public ItemStack createLockItem(@NotNull LockMaterial material, int amount) {
         return ItemHelper.builder(material.getItemMaterial(), amount)
                 .setName(ChatColor.AQUA + "Locked " + ChatColor.WHITE + material.getItemName())
-                .setLore(getSettings().getLocks().getLockLore())
+                .setLore(getItemDescriptions().getLockLore())
                 .addGlow()
                 .createLockData()
                 .buildItem();
@@ -132,7 +144,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
     public ItemStack createSealingDust(int amount) {
         return ItemHelper.builder(Material.REDSTONE, amount)
                 .setName(ChatColor.GOLD + getSettings().getLocks().getDustName())
-                .setLore(getSettings().getLocks().getDustLore())
+                .setLore(getItemDescriptions().getDustLore())
                 .addGlow()
                 .makeUnplaceable()
                 .createDustData()
@@ -142,7 +154,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
     public ItemStack createDustBlock(int amount) {
         return ItemHelper.builder(Material.REDSTONE_BLOCK, amount)
                 .setName(ChatColor.GOLD + getSettings().getLocks().getDustBlockName())
-                .setLore(getSettings().getLocks().getDustBlockLore())
+                .setLore(getItemDescriptions().getDustBlockLore())
                 .addGlow()
                 .makeUnplaceable()
                 .createDustData()
@@ -152,7 +164,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
     public ItemStack createBlankKeyItem(int amount) {
         return ItemHelper.builder(Material.TRIPWIRE_HOOK, amount)
                 .setName(ChatColor.GOLD + "Uncut Key")
-                .setLore(getSettings().getLocks().getUncutKeyLore())
+                .setLore(getItemDescriptions().getUncutKeyLore())
                 .addGlow()
                 .makeUnplaceable()
                 .createKeyData()

@@ -13,10 +13,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import pluginbase.command.*;
+import pluginbase.command.Command;
+import pluginbase.command.CommandContext;
+import pluginbase.command.CommandException;
+import pluginbase.command.CommandInfo;
+import pluginbase.command.CommandProvider;
 import pluginbase.messages.Message;
 import pluginbase.minecraft.BasePlayer;
 import pluginbase.permission.Perm;
+
+import static com.dumptruckman.lockandkey.Messages.*;
 
 @CommandInfo(
         primaryAlias = "givelock",
@@ -53,7 +59,7 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
         }
 
         if (!sender.isPlayer() && !context.hasFlag('p')) {
-            sender.sendMessage("Must specify a player to use from console.");
+            IN_GAME_ONLY.sendByChat(sender);
             return true;
         }
 
@@ -62,7 +68,7 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
         try {
             material = LockMaterial.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
-            sender.sendMessage("'" + type + "' is not a valid Lock type");
+            INVALID_LOCK_TYPE.sendByChat(sender, type);
             return true;
         }
 
@@ -71,7 +77,7 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
             try {
                 amount = context.getInteger(1);
             } catch (NumberFormatException e) {
-                sender.sendMessage("'" + context.getString(1) + "' is not a valid amount!");
+                INVALID_AMOUNT.sendByChat(sender, context.getString(1));
                 return true;
             }
         }
@@ -80,7 +86,7 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
 
         Player player = getPlugin().getServer().getPlayer(name);
         if (player == null) {
-            sender.sendMessage("'" + name + "' is not a valid player!");
+            INVALID_PLAYER.sendByChat(sender, name);
             return false;
         }
 
@@ -88,12 +94,11 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
         String itemName = lockItem.getItemMeta().getDisplayName();
         player.getInventory().addItem(lockItem);
         player.updateInventory();
-        sender.sendMessage("Gave " + ChatColor.GRAY + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + itemName);
+        GAVE_ITEM.sendByChat(sender, name, amount, itemName);
         return true;
     }
 
     private void listLockTypes(@NotNull BasePlayer sender) {
-        sender.sendMessage("Lock types available: ");
         StringBuilder allTypes = new StringBuilder();
         ChatColor color = ChatColor.WHITE;
         for (LockMaterial material : LockMaterial.values()) {
@@ -108,5 +113,6 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
                 color = ChatColor.WHITE;
             }
         }
+        LOCK_TYPES_AVAILABLE.sendByChat(sender, allTypes.toString());
     }
 }

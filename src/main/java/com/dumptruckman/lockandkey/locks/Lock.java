@@ -6,11 +6,8 @@
 package com.dumptruckman.lockandkey.locks;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
-import com.dumptruckman.lockandkey.PluginSettings.Locks;
+import com.dumptruckman.lockandkey.PluginSettings.LockSettings;
 import com.dumptruckman.lockandkey.util.ItemHelper;
-import com.dumptruckman.lockandkey.util.Log;
-import com.elmakers.mine.bukkit.utility.CompatibilityUtils;
-import com.elmakers.mine.bukkit.utility.InventoryUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -75,7 +72,7 @@ public final class Lock {
         return registry.getPlugin();
     }
 
-    private Locks getLockSettings() {
+    private LockSettings getLockSettings() {
         return getPlugin().getSettings().getLocks();
     }
 
@@ -163,7 +160,7 @@ public final class Lock {
             throw new IllegalArgumentException("The lock must have a key code first.");
         }
 
-        List<String> lore = new ArrayList<>(getLockSettings().getKeyLore());
+        List<String> lore = new ArrayList<>(getLockSettings().getDescriptions().getKeyLore());
         if (getLockSettings().isLockCodeVisible()) {
             lore.add(ChatColor.GRAY.toString() + ChatColor.ITALIC.toString() + keyCode);
         }

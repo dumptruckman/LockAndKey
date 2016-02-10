@@ -21,6 +21,8 @@ import pluginbase.messages.Message;
 import pluginbase.minecraft.BasePlayer;
 import pluginbase.permission.Perm;
 
+import static com.dumptruckman.lockandkey.Messages.*;
+
 @CommandInfo(
         primaryAlias = "givekey",
         aliases = {"givekey"},
@@ -51,7 +53,7 @@ public class GiveKeyCommand extends Command<LockAndKeyPlugin> {
     @Override
     public boolean runCommand(@NotNull BasePlayer sender, @NotNull CommandContext context) throws CommandException {
         if (!sender.isPlayer() && !context.hasFlag('p')) {
-            sender.sendMessage("Must specify a player to use from console.");
+            IN_GAME_ONLY.sendByChat(sender);
             return true;
         }
 
@@ -60,7 +62,7 @@ public class GiveKeyCommand extends Command<LockAndKeyPlugin> {
             try {
                 amount = context.getInteger(0);
             } catch (NumberFormatException e) {
-                sender.sendMessage("'" + context.getString(1) + "' is not a valid amount!");
+                INVALID_AMOUNT.sendByChat(sender, context.getString(1));
                 return true;
             }
         }
@@ -69,14 +71,14 @@ public class GiveKeyCommand extends Command<LockAndKeyPlugin> {
 
         Player player = getPlugin().getServer().getPlayer(name);
         if (player == null) {
-            sender.sendMessage("'" + name + "' is not a valid player!");
+            INVALID_PLAYER.sendByChat(sender, name);
             return false;
         }
 
         ItemStack lockDust = getPlugin().createBlankKeyItem(amount);
         player.getInventory().addItem(lockDust);
         player.updateInventory();
-        sender.sendMessage("Gave " + ChatColor.GRAY + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + lockDust.getItemMeta().getDisplayName());
+        GAVE_ITEM.sendByChat(sender, name, amount, lockDust.getItemMeta().getDisplayName());
         return true;
     }
 }

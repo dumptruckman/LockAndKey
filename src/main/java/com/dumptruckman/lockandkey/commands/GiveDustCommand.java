@@ -6,17 +6,22 @@
 package com.dumptruckman.lockandkey.commands;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
-import com.dumptruckman.lockandkey.locks.LockDust;
 import com.dumptruckman.lockandkey.util.Perms;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import pluginbase.command.*;
+import pluginbase.command.Command;
+import pluginbase.command.CommandContext;
+import pluginbase.command.CommandException;
+import pluginbase.command.CommandInfo;
+import pluginbase.command.CommandProvider;
 import pluginbase.messages.Message;
 import pluginbase.minecraft.BasePlayer;
 import pluginbase.permission.Perm;
+
+import static com.dumptruckman.lockandkey.Messages.*;
 
 @CommandInfo(
         primaryAlias = "givedust",
@@ -48,7 +53,7 @@ public class GiveDustCommand extends Command<LockAndKeyPlugin> {
     @Override
     public boolean runCommand(@NotNull BasePlayer sender, @NotNull CommandContext context) throws CommandException {
         if (!sender.isPlayer() && !context.hasFlag('p')) {
-            sender.sendMessage("Must specify a player to use from console.");
+            IN_GAME_ONLY.sendByChat(sender);
             return true;
         }
 
@@ -57,7 +62,7 @@ public class GiveDustCommand extends Command<LockAndKeyPlugin> {
             try {
                 amount = context.getInteger(0);
             } catch (NumberFormatException e) {
-                sender.sendMessage("'" + context.getString(1) + "' is not a valid amount!");
+                INVALID_AMOUNT.sendByChat(sender, context.getString(1));
                 return true;
             }
         }
@@ -66,7 +71,7 @@ public class GiveDustCommand extends Command<LockAndKeyPlugin> {
 
         Player player = getPlugin().getServer().getPlayer(name);
         if (player == null) {
-            sender.sendMessage("'" + name + "' is not a valid player!");
+            INVALID_PLAYER.sendByChat(sender, name);
             return false;
         }
 
@@ -79,7 +84,7 @@ public class GiveDustCommand extends Command<LockAndKeyPlugin> {
 
         player.getInventory().addItem(item);
         player.updateInventory();
-        sender.sendMessage("Gave " + ChatColor.GRAY + name + " " + ChatColor.ITALIC + ChatColor.GREEN + amount + " " + item.getItemMeta().getDisplayName());
+        GAVE_ITEM.sendByChat(sender, name, amount, item.getItemMeta().getDisplayName());
         return true;
     }
 }

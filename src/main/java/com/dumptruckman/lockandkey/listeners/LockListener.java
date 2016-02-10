@@ -8,7 +8,6 @@ package com.dumptruckman.lockandkey.listeners;
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.locks.Lock;
 import com.dumptruckman.lockandkey.locks.LockRegistry;
-import com.dumptruckman.lockandkey.util.ActionBarUtil;
 import com.dumptruckman.lockandkey.util.ItemHelper;
 import com.dumptruckman.lockandkey.util.Log;
 import com.dumptruckman.lockandkey.util.Perms;
@@ -24,11 +23,21 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.*;
+import org.bukkit.material.Attachable;
+import org.bukkit.material.Door;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.PressurePlate;
 import org.jetbrains.annotations.NotNull;
+
+import static com.dumptruckman.lockandkey.Messages.*;
 
 public class LockListener implements Listener {
 
@@ -51,7 +60,7 @@ public class LockListener implements Listener {
             return;
         }
         Lock lock = getLockRegistry().createLock(event.getBlock(), event.getPlayer(), ItemHelper.getKeyCode(item));
-        event.getPlayer().sendMessage(ChatColor.AQUA + "You placed a Locked " + lock.getLockMaterial().getItemName() + "!");
+        PLACED_LOCK.sendByChat(event.getPlayer(), lock.getLockMaterial().getItemName());
     }
 
     @EventHandler(ignoreCancelled = false)
@@ -97,35 +106,35 @@ public class LockListener implements Listener {
             }
             event.setCancelled(true);
             event.setUseInteractedBlock(Event.Result.DENY);
-            ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "You need a key to use that " + lock.getLockMaterial().getItemName());
+            NEED_KEY.sendByActionBar(player, lock.getLockMaterial().getItemName());
             player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ZOMBIE_WOOD, .2F, 1F);
         }
     }
 
     private void fitKey(@NotNull Player player, @NotNull Lock lock, @NotNull ItemStack itemInHand) {
         if (!lock.isOwner(player.getUniqueId())) {
-            ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "You must be the owner to configure the lock!");
+            MUST_BE_OWNER.sendByActionBar(player);
             return;
         }
         if (ItemHelper.isBlankKeyItem(itemInHand)) {
             if (itemInHand.getAmount() > 1) {
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "You can only cut one key at a time!");
+                ONE_KEY_AT_A_TIME.sendByActionBar(player);
                 return;
             }
             if (lock.hasKeyCode()) {
                 lock.cutKey(itemInHand);
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "Key has been cut to existing lock!");
+                KEY_CUT_FOR_EXISTING_LOCK.sendByActionBar(player);
             } else {
                 lock.setKeyCode(plugin.createRandomizedKeyCode());
                 lock.cutKey(itemInHand);
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "Key has been cut to new lock!");
+                KEY_CUT_FOR_NEW_LOCK.sendByActionBar(player);
             }
         } else {
             if (lock.hasKeyCode()) {
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.RED + "This lock already uses a different key.");
+                LOCK_ALREADY_HAS_KEY.sendByActionBar(player);
             } else {
                 lock.useNewKey(itemInHand);
-                ActionBarUtil.sendActionBarMessage(player, ChatColor.GREEN + "New lock installed for this key!");
+                NEW_LOCK_INSTALLED_FOR_KEY.sendByActionBar(player);
             }
         }
     }

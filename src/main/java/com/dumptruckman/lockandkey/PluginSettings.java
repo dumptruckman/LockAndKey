@@ -17,7 +17,7 @@ import java.util.List;
 @NoTypeKey
 public final class PluginSettings extends Settings {
 
-    private Locks locks = new Locks();
+    private LockSettings locks = new LockSettings();
 
     public PluginSettings(@NotNull PluginBase plugin) {
         super(plugin);
@@ -26,12 +26,12 @@ public final class PluginSettings extends Settings {
     private PluginSettings() {
     }
 
-    public Locks getLocks() {
+    public LockSettings getLocks() {
         return locks;
     }
 
     @NoTypeKey
-    public final static class Locks {
+    public final static class LockSettings {
 
         @Comment({"How often to save lock data (in ticks).", "1200 ticks is approximately 1 minute"})
         private long saveTicks = 1200L;
@@ -41,50 +41,8 @@ public final class PluginSettings extends Settings {
         private String dustName = "Sealing Dust";
         @Comment({"The name of the lock creation ingredient block (Redstone Block)"})
         private String dustBlockName = "Concentrated Sealing Dust";
-
-        @Comment({"This is the item description of locked items (doors, buttons, etc)"})
-        private List<String> lockLore;
-        {
-            lockLore = new ArrayList<>();
-            lockLore.add("This item is locked when placed.");
-            lockLore.add("It can only be opened by the owner");
-            lockLore.add("or anyone with a key.");
-        }
-
-        @Comment({"This is the item description of the Sealing Dust"})
-        private List<String> dustLore;
-        {
-            dustLore = new ArrayList<>();
-            dustLore.add("This dust contains the");
-            dustLore.add("magic required to lock");
-            dustLore.add("objects so that only");
-            dustLore.add("their owner may use them.");
-        }
-
-        @Comment({"This is the item description of the Concentrated Sealing Dust"})
-        private List<String> dustBlockLore;
-        {
-            dustBlockLore = new ArrayList<>();
-            dustBlockLore.add("A concentrated form of");
-            dustBlockLore.add("Sealing Dust");
-        }
-
-        @Comment({"This is the item description of an Uncut Key"})
-        private List<String> uncutKeyLore;
-        {
-            uncutKeyLore = new ArrayList<>();
-            uncutKeyLore.add("This key can be cut to fit any lock.");
-            uncutKeyLore.add("Sneak right click the locked block");
-            uncutKeyLore.add("to configure this key for that block.");
-        }
-
-        @Comment({"This is the item description of an (cut) Key"})
-        private List<String> keyLore;
-        {
-            keyLore = new ArrayList<>();
-            keyLore.add("This key unlocks something somewhere...");
-        }
-
+        @Comment({"This section is where you can change the description on the different items from this plugin."})
+        private Descriptions descriptions;
         @Comment({"Whether or not to show the lock code as the last line of the item lore of items"})
         private boolean lockCodeVisible = true;
         @Comment({"This is a string of all the valid characters than can be used for a lock code.",
@@ -110,26 +68,6 @@ public final class PluginSettings extends Settings {
             return dustBlockName;
         }
 
-        public List<String> getLockLore() {
-            return lockLore;
-        }
-
-        public List<String> getDustLore() {
-            return dustLore;
-        }
-
-        public List<String> getDustBlockLore() {
-            return dustBlockLore;
-        }
-
-        public List<String> getUncutKeyLore() {
-            return uncutKeyLore;
-        }
-
-        public List<String> getKeyLore() {
-            return keyLore;
-        }
-
         public String getLockCodeCharacters() {
             return lockCodeCharacters;
         }
@@ -140,6 +78,77 @@ public final class PluginSettings extends Settings {
 
         public boolean isLockCodeVisible() {
             return lockCodeVisible;
+        }
+
+        public Descriptions getDescriptions() {
+            return descriptions;
+        }
+
+        @NoTypeKey
+        public final static class Descriptions {
+
+            @Comment({"This is the item description of locked items (doors, buttons, etc)"})
+            private List<String> lockLore;
+            {
+                lockLore = new ArrayList<>();
+                lockLore.add("This item is locked when placed.");
+                lockLore.add("It can only be opened by the owner");
+                lockLore.add("or anyone with a key.");
+            }
+
+            @Comment({"This is the item description of the Sealing Dust"})
+            private List<String> dustLore;
+            {
+                dustLore = new ArrayList<>();
+                dustLore.add("This dust contains the");
+                dustLore.add("magic required to lock");
+                dustLore.add("objects so that only");
+                dustLore.add("their owner may use them.");
+            }
+
+            @Comment({"This is the item description of the Concentrated Sealing Dust"})
+            private List<String> dustBlockLore;
+            {
+                dustBlockLore = new ArrayList<>();
+                dustBlockLore.add("A concentrated form of");
+                dustBlockLore.add("Sealing Dust");
+            }
+
+            @Comment({"This is the item description of an Uncut Key"})
+            private List<String> uncutKeyLore;
+            {
+                uncutKeyLore = new ArrayList<>();
+                uncutKeyLore.add("This key can be cut to fit any lock.");
+                uncutKeyLore.add("Sneak right click the locked block");
+                uncutKeyLore.add("to configure this key for that block.");
+            }
+
+            @Comment({"This is the item description of an (cut) Key"})
+            private List<String> keyLore;
+            {
+                keyLore = new ArrayList<>();
+                keyLore.add("This key unlocks something somewhere...");
+            }
+
+            public List<String> getLockLore() {
+                return lockLore;
+            }
+
+            public List<String> getDustLore() {
+                return dustLore;
+            }
+
+            public List<String> getDustBlockLore() {
+                return dustBlockLore;
+            }
+
+            public List<String> getUncutKeyLore() {
+                return uncutKeyLore;
+            }
+
+            public List<String> getKeyLore() {
+                return keyLore;
+            }
         }
     }
 }
