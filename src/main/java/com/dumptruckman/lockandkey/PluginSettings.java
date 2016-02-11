@@ -42,7 +42,7 @@ public final class PluginSettings extends Settings {
         @Comment({"The name of the lock creation ingredient block (Redstone Block)"})
         private String dustBlockName = "Concentrated Sealing Dust";
         @Comment({"This section is where you can change the description on the different items from this plugin."})
-        private Descriptions descriptions;
+        private Descriptions descriptions = new Descriptions();
         @Comment({"Whether or not to show the lock code as the last line of the item lore of items"})
         private boolean lockCodeVisible = true;
         @Comment({"This is a string of all the valid characters than can be used for a lock code.",

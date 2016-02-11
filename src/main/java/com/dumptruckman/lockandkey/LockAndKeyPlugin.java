@@ -62,6 +62,9 @@ public class LockAndKeyPlugin extends JavaPlugin {
         pluginAgent.registerCommand(GiveLockCommand.class);
         pluginAgent.registerCommand(GiveDustCommand.class);
         pluginAgent.registerCommand(GiveKeyCommand.class);
+
+        // Register language
+        pluginbase.messages.Messages.registerMessages(getPluginBase(), Messages.class);
     }
 
     @Override
