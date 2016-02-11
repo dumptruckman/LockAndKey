@@ -146,7 +146,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
 
     public ItemStack createLockItem(@NotNull LockMaterial material, int amount, @Nullable String keyCode) {
         List<String> lore = new ArrayList<>(getItemDescriptions().getLockLore());
-        if (getLockSettings().isLockCodeVisible()) {
+        if (getLockSettings().isLockCodeVisible() && keyCode != null) {
             lore.add(ChatColor.GRAY.toString() + ChatColor.ITALIC.toString() + keyCode);
         }
         return ItemHelper.builder(material.getItemMaterial(), amount)
