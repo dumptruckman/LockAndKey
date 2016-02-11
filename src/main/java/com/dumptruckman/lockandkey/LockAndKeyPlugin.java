@@ -25,11 +25,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import pluginbase.bukkit.BukkitPluginAgent;
 import pluginbase.plugin.PluginBase;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -91,7 +94,7 @@ public class LockAndKeyPlugin extends JavaPlugin {
 
         exampleLockItems = new LinkedHashSet<>(LockMaterial.values().length);
         for (LockMaterial material : LockMaterial.values()) {
-            exampleLockItems.add(createLockItem(material, 1));
+            exampleLockItems.add(createLockItem(material, 1, null));
         }
         int recipesLoaded = recipes.loadRecipes();
         Log.info("Loaded " + recipesLoaded + " recipes.");
@@ -141,10 +144,14 @@ public class LockAndKeyPlugin extends JavaPlugin {
         return exampleLockItems;
     }
 
-    public ItemStack createLockItem(@NotNull LockMaterial material, int amount) {
+    public ItemStack createLockItem(@NotNull LockMaterial material, int amount, @Nullable String keyCode) {
+        List<String> lore = new ArrayList<>(getItemDescriptions().getLockLore());
+        if (getLockSettings().isLockCodeVisible()) {
+            lore.add(ChatColor.GRAY.toString() + ChatColor.ITALIC.toString() + keyCode);
+        }
         return ItemHelper.builder(material.getItemMaterial(), amount)
                 .setName(ChatColor.AQUA + "Locked " + ChatColor.WHITE + material.getItemName())
-                .setLore(getItemDescriptions().getLockLore())
+                .setLore(lore)
                 .addGlow()
                 .createLockData()
                 .buildItem();

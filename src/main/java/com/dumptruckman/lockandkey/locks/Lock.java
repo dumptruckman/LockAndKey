@@ -125,7 +125,7 @@ public final class Lock {
 
     @Nullable
     public String getKeyCode() {
-        return this.keyCode;
+        return keyCode == null || keyCode.isEmpty() ? null : keyCode;
     }
 
     public void setKeyCode(@Nullable String keyCode) {
@@ -137,7 +137,7 @@ public final class Lock {
     }
 
     public ItemStack createLockItem(int amount) {
-        ItemStack item = getPlugin().createLockItem(getLockMaterial(), amount);
+        ItemStack item = getPlugin().createLockItem(getLockMaterial(), amount, getKeyCode());
         return ItemHelper.setKeyCode(item, getKeyCode());
     }
 

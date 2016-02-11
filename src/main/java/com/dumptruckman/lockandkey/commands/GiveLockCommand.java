@@ -90,7 +90,7 @@ public class GiveLockCommand extends Command<LockAndKeyPlugin> {
             return false;
         }
 
-        ItemStack lockItem = getPlugin().createLockItem(material, amount);
+        ItemStack lockItem = getPlugin().createLockItem(material, amount, null);
         String itemName = lockItem.getItemMeta().getDisplayName();
         player.getInventory().addItem(lockItem);
         player.updateInventory();
