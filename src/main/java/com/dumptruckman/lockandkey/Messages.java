@@ -1,6 +1,7 @@
 package com.dumptruckman.lockandkey;
 
 import com.dumptruckman.lockandkey.util.ActionBarUtil;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,11 +67,11 @@ public enum Messages implements Message {
         }
     }
 
-    public void sendByChat(@NotNull Player player, Object... args) {
+    public void sendByChat(@NotNull CommandSender sender, Object... args) {
         if (messager != null) {
-            messager.message(player, this, args);
+            messager.message(sender, this, args);
         } else {
-            player.sendMessage(String.format(getDefault(), args));
+            sender.sendMessage(String.format(getDefault(), args));
         }
     }
 
