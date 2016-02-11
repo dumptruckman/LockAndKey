@@ -35,7 +35,7 @@ import java.util.Set;
 
 public class LockAndKeyPlugin extends JavaPlugin {
 
-    private final BukkitPluginAgent<LockAndKeyPlugin> pluginAgent = BukkitPluginAgent.getPluginAgent(LockAndKeyPlugin.class, this, "lak");
+    private final BukkitPluginAgent<LockAndKeyPlugin> pluginAgent;
 
     private final Random random = new Random(System.currentTimeMillis());
 
@@ -45,8 +45,17 @@ public class LockAndKeyPlugin extends JavaPlugin {
     private Set<ItemStack> exampleLockItems;
 
     public LockAndKeyPlugin() {
+        pluginAgent = BukkitPluginAgent.getPluginAgent(LockAndKeyPlugin.class, this, "lak");
         pluginAgent.setDefaultSettingsCallable(() -> new PluginSettings(getPluginBase()));
         pluginAgent.setPermissionPrefix("lockandkey");
+
+        // Register commands
+        pluginAgent.registerCommand(GiveLockCommand.class);
+        pluginAgent.registerCommand(GiveDustCommand.class);
+        pluginAgent.registerCommand(GiveKeyCommand.class);
+
+        // Register language
+        pluginAgent.registerMessages(Messages.class);
     }
 
     PluginBase getPluginBase() {
@@ -57,14 +66,6 @@ public class LockAndKeyPlugin extends JavaPlugin {
     public void onLoad() {
         pluginAgent.loadPluginBase();
         Log.init(getPluginBase().getLog());
-
-        // Register commands
-        pluginAgent.registerCommand(GiveLockCommand.class);
-        pluginAgent.registerCommand(GiveDustCommand.class);
-        pluginAgent.registerCommand(GiveKeyCommand.class);
-
-        // Register language
-        pluginbase.messages.Messages.registerMessages(getPluginBase(), Messages.class);
     }
 
     @Override
