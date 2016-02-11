@@ -42,6 +42,7 @@ public final class Lock {
         this.registry = lockRegistry;
         this.location = new LockLocation(block);
         this.lockMaterial = LockMaterial.getByBlockMaterial(block.getType());
+        this.keyCode = keyCode;
         if (lockMaterial == null) {
             throw new IllegalArgumentException("Invalid lock material: " + block.getType());
         }
