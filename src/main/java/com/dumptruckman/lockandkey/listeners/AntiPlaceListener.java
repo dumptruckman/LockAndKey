@@ -6,6 +6,7 @@
 package com.dumptruckman.lockandkey.listeners;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
+import com.dumptruckman.lockandkey.util.CompatibilityUtils;
 import com.dumptruckman.lockandkey.util.ItemHelper;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,7 +31,14 @@ public class AntiPlaceListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void preventPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
-        if (item == null || item.getType() != Material.CHEST) {
+        if (item == null) {
+            return;
+        }
+        if (CompatibilityUtils.isUnplaceable(item)) {
+            event.setCancelled(true);
+            return;
+        }
+        if (item.getType() != Material.CHEST) {
             return;
         }
         boolean isLock = ItemHelper.isLockItem(item);
