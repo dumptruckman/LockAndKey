@@ -35,7 +35,11 @@ import org.bukkit.material.Attachable;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.PressurePlate;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.dumptruckman.lockandkey.Messages.*;
 
@@ -43,6 +47,7 @@ public class LockListener implements Listener {
 
     @NotNull
     private final LockAndKeyPlugin plugin;
+    private final Set<Player> recentInteract = new HashSet<>();
 
     public LockListener(@NotNull final LockAndKeyPlugin plugin) {
         this.plugin = plugin;
@@ -106,8 +111,19 @@ public class LockListener implements Listener {
             }
             event.setCancelled(true);
             event.setUseInteractedBlock(Event.Result.DENY);
-            NEED_KEY.sendByActionBar(player, lock.getLockMaterial().getItemName());
-            player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ZOMBIE_WOOD, .2F, 1F);
+            if (!recentInteract.contains(player)) {
+                NEED_KEY.sendByActionBar(player, lock.getLockMaterial().getItemName());
+                player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ZOMBIE_WOOD, .2F, 1F);
+                if (event.getAction() == Action.PHYSICAL) {
+                    recentInteract.add(player);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            recentInteract.remove(player);
+                        }
+                    }.runTaskLater(plugin, 60L);
+                }
+            }
         }
     }
 
