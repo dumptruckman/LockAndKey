@@ -30,13 +30,6 @@ public class AntiPlaceListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void preventPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
-        /*
-        if (ItemHelper.isDustItem(item)
-                || ItemHelper.isDustBlockItem(item)
-                || ItemHelper.isKeyItem(item)) {
-            event.setCancelled(true);
-        }
-        */
         if (item == null || item.getType() != Material.CHEST) {
             return;
         }

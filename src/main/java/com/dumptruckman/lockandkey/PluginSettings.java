@@ -35,8 +35,6 @@ public final class PluginSettings extends Settings {
 
         @Comment({"How often to save lock data (in ticks).", "1200 ticks is approximately 1 minute"})
         private long saveTicks = 1200L;
-        @Comment({"Whether the other must have a key to open their own locks", "False means that the owner can lock/unlock without a key."})
-        private boolean keyRequiredForOwner = false;
         @Comment({"The name of the lock creation ingredient (Redstone)"})
         private String dustName = "Sealing Dust";
         @Comment({"The name of the lock creation ingredient block (Redstone Block)"})
@@ -54,10 +52,6 @@ public final class PluginSettings extends Settings {
 
         public long getSaveTicks() {
             return saveTicks;
-        }
-
-        public boolean isKeyRequiredForOwner() {
-            return keyRequiredForOwner;
         }
 
         public String getDustName() {

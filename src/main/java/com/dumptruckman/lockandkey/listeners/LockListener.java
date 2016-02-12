@@ -93,7 +93,7 @@ public class LockListener implements Listener {
             return;
         }
 
-        if (!plugin.getSettings().getLocks().isKeyRequiredForOwner() && lock.isOwner(player.getUniqueId())){
+        if (Perms.NO_OWNER_KEY_NEEDED.hasPermission(player) && lock.isOwner(player.getUniqueId())){
             return;
         }
 
