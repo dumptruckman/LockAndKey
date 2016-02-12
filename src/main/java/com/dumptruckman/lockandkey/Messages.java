@@ -32,6 +32,16 @@ public enum Messages implements Message {
     NEW_LOCK_INSTALLED_FOR_KEY("locks.new_lock_installed_for_key", ChatColor.GREEN + "New lock installed for this key!"),
     ;
 
+    private static boolean isCorrectCBVersion;
+    static {
+        try {
+            Class.forName("org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer");
+            isCorrectCBVersion = true;
+        } catch (ClassNotFoundException ignore) {
+            isCorrectCBVersion = false;
+        }
+    }
+
     private static LockAndKeyPlugin plugin;
     private static BukkitMessager messager;
 
@@ -81,6 +91,9 @@ public enum Messages implements Message {
     }
 
     public void sendByActionBar(@NotNull Player player, Object... args) {
+        if (!isCorrectCBVersion) {
+            sendByChat(player, args);
+        }
         if (messager != null) {
             ActionBarUtil.sendActionBarMessage(player, messager.getLocalizedMessage(this, args));
         } else {
@@ -89,6 +102,9 @@ public enum Messages implements Message {
     }
 
     public void sendByActionBarExtended(@NotNull Player player, int duration, Object... args) {
+        if (!isCorrectCBVersion) {
+            sendByChat(player, args);
+        }
         if (messager != null) {
             ActionBarUtil.sendActionBarMessage(player, messager.getLocalizedMessage(this, args), duration, plugin);
         } else {
