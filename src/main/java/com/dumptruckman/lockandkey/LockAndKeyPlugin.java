@@ -85,13 +85,6 @@ public class LockAndKeyPlugin extends JavaPlugin {
             Log.severe("Could not load locks!");
         }
 
-        if (!getServer().getPluginManager().isPluginEnabled("Magic")
-                && !getServer().getPluginManager().isPluginEnabled("MagicLib")) {
-            Log.severe("Magic or MagicLib must be installed before using LockAndKey!");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
         exampleLockItems = new LinkedHashSet<>(LockMaterial.values().length);
         for (LockMaterial material : LockMaterial.values()) {
             exampleLockItems.add(createLockItem(material, 1, null));

@@ -1,8 +1,6 @@
 package com.dumptruckman.lockandkey.util;
 
 import com.dumptruckman.lockandkey.locks.LockMaterial;
-import com.elmakers.mine.bukkit.utility.CompatibilityUtils;
-import com.elmakers.mine.bukkit.utility.InventoryUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
@@ -60,24 +58,24 @@ public class ItemHelper {
 
     @Nullable
     public static String getKeyCode(@NotNull ItemStack item) {
-        return InventoryUtils.getMeta(item, KEY_CODE_KEY);
+        return CompatibilityUtils.getMeta(item, KEY_CODE_KEY);
     }
 
     public static ItemStack setKeyCode(@NotNull ItemStack item, @Nullable String keyCode) {
         if (keyCode == null) {
-            InventoryUtils.removeMeta(item, KEY_CODE_KEY);
+            CompatibilityUtils.removeMeta(item, KEY_CODE_KEY);
         } else {
-            InventoryUtils.setMeta(item, KEY_CODE_KEY, keyCode);
+            CompatibilityUtils.setMeta(item, KEY_CODE_KEY, keyCode);
         }
         return item;
     }
 
     private static void createNode(@NotNull ItemStack item, @NotNull String nodeName) {
-        InventoryUtils.setMeta(item, nodeName, "true");
+        CompatibilityUtils.setMeta(item, nodeName, "true");
     }
 
     private static boolean hasNode(@NotNull ItemStack item, @NotNull String nodeName) {
-        return InventoryUtils.hasMeta(item, nodeName);
+        return CompatibilityUtils.hasMeta(item, nodeName);
     }
 
     @NotNull
@@ -91,7 +89,7 @@ public class ItemHelper {
 
     private void makeReal() {
         if (!real) {
-            this.item = InventoryUtils.makeReal(item);
+            this.item = CompatibilityUtils.makeReal(item);
         }
     }
 
@@ -122,7 +120,7 @@ public class ItemHelper {
 
     public ItemHelper makeUnplaceable() {
         makeReal();
-        InventoryUtils.makeUnplaceable(item);
+        CompatibilityUtils.makeUnplaceable(item);
         return this;
     }
 
