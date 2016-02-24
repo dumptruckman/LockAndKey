@@ -7,7 +7,10 @@ package com.dumptruckman.lockandkey.util;
 
 import com.dumptruckman.lockandkey.locks.LockMaterial;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -143,7 +146,11 @@ public class ItemHelper {
 
     public ItemHelper addGlow() {
         makeReal();
-        CompatibilityUtils.addGlow(item);
+        ItemMeta meta = item.getItemMeta();
+        meta.addEnchant(Enchantment.LUCK, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        item.setItemMeta(meta);
+        //CompatibilityUtils.addGlow(item);
         return this;
     }
 
