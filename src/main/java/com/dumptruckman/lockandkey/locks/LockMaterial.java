@@ -140,6 +140,9 @@ public enum LockMaterial {
         String[] split = itemName.split("_");
         StringBuilder builder = new StringBuilder();
         for (String part : split) {
+            if (builder.length() > 0) {
+                builder.append(" ");
+            }
             builder.append(CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, part));
         }
         return builder.toString();
