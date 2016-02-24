@@ -51,7 +51,7 @@ public class RecipeListener implements Listener {
         ItemStack[] matrix = event.getInventory().getMatrix();
         boolean found = false;
         for (int i = 0; i < matrix.length - 1; i++) {
-            if (matrix[i] == null) {
+            if (matrix[i] == null || matrix[i].getType() == Material.AIR) {
                 continue;
             }
             if (!ItemHelper.isDustBlockItem(matrix[i])) {
