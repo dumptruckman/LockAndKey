@@ -45,10 +45,10 @@ public final class PluginSettings extends Settings {
         private boolean lockCodeVisible = true;
         @Comment({"This is a string of all the valid characters than can be used for a lock code.",
                  "A random selection of these will be created for every new key-lock combination."})
-        private String lockCodeCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        private String lockCodeCharacters = "ABCDEF1234567890";
         @Comment({"This is the number of characters to use in a lock code.",
                 "Having a small length and few characters raises the chance to produce keys that work on locks they were not created for."})
-        private int lockCodeLength = 5;
+        private int lockCodeLength = 4;
 
         public long getSaveTicks() {
             return saveTicks;
