@@ -87,11 +87,11 @@ public enum LockMaterial {
     }
 
     LockMaterial(@NotNull Material item, @NotNull Material block, boolean isDoor) {
-        this(item, block, CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, block.name()), isDoor);
+        this(item, block, formatName(block.name()), isDoor);
     }
 
     LockMaterial(@NotNull Material item, @NotNull Material block, boolean isDoor, @NotNull final Action action) {
-        this(item, block, CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, block.name()), isDoor, action);
+        this(item, block, formatName(block.name()), isDoor, action);
     }
 
     LockMaterial(@NotNull Material item, @NotNull String name) {
@@ -134,5 +134,14 @@ public enum LockMaterial {
 
     public Action getInteractAction() {
         return action;
+    }
+
+    private static String formatName(@NotNull String itemName) {
+        String[] split = itemName.split("_");
+        StringBuilder builder = new StringBuilder();
+        for (String part : split) {
+            builder.append(CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, part));
+        }
+        return builder.toString();
     }
 }
