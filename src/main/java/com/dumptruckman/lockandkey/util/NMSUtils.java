@@ -74,11 +74,13 @@ public class NMSUtils {
     protected static Class<?> class_DataWatcher;
     protected static Class<?> class_DamageSource;
     protected static Class<?> class_EntityDamageSource;
+    protected static Class<?> class_IAttribute;
+    protected static Class<?> class_GenericAttributes;
+    protected static Class<?> class_AttributeInstance;
     protected static Class<?> class_World;
     protected static Class<?> class_WorldServer;
     protected static Class<?> class_Packet;
     protected static Class<Enum> class_EnumSkyBlock;
-    protected static Class<?> class_PacketPlayOutMapChunkBulk;
     protected static Class<?> class_EntityPainting;
     protected static Class<?> class_EntityItemFrame;
     protected static Class<?> class_EntityMinecartRideable;
@@ -108,6 +110,9 @@ public class NMSUtils {
     protected static Class<?> class_PacketPlayOutSpawnEntityLiving;
     protected static Class<?> class_PacketPlayOutEntityMetadata;
     protected static Class<?> class_PacketPlayOutEntityStatus;
+    protected static Class<?> class_PacketPlayOutCustomSoundEffect;
+    protected static Enum<?> enum_SoundCategory_PLAYERS;
+    protected static Class<Enum> class_EnumSoundCategory;
     protected static Class<?> class_EntityFallingBlock;
     protected static Class<?> class_EntityArmorStand;
     protected static Class<?> class_EntityPlayer;
@@ -132,9 +137,11 @@ public class NMSUtils {
     protected static Method class_Entity_setYawPitchMethod;
     protected static Method class_Entity_getBukkitEntityMethod;
     protected static Method class_EntityLiving_damageEntityMethod;
+    protected static Method class_EntityLiving_getAttributeInstanceMethod;
+    protected static Method class_AttributeInstance_getValueMethod;
+    protected static Method class_AttributeInstance_setValueMethod;
     protected static Method class_DamageSource_getMagicSourceMethod;
     protected static Method class_EntityDamageSource_setThornsMethod;
-    protected static Method class_AxisAlignedBB_createBBMethod;
     protected static Method class_World_explodeMethod;
     protected static Method class_NBTTagCompound_setBooleanMethod;
     protected static Method class_NBTTagCompound_setStringMethod;
@@ -202,8 +209,10 @@ public class NMSUtils {
     protected static Constructor class_PacketPlayOutEntityMetadata_Constructor;
     protected static Constructor class_PacketPlayOutEntityStatus_Constructor;
     protected static Constructor class_PacketPlayOutEntityDestroy_Constructor;
+    protected static Constructor class_PacketPlayOutCustomSoundEffect_Constructor;
     protected static Constructor class_ChestLock_Constructor;
     protected static Constructor class_ArmorStand_Constructor;
+    protected static Constructor class_AxisAlignedBB_Constructor;
 
     protected static Field class_Entity_invulnerableField;
     protected static Field class_Entity_motXField;
@@ -236,9 +245,10 @@ public class NMSUtils {
     protected static Field class_Chunk_doneField;
     protected static Field class_CraftItemStack_getHandleField;
     protected static Field class_EntityArrow_lifeField = null;
-    protected static Field class_EntityArrow_fromPlayerField;
     protected static Field class_EntityArrow_damageField;
     protected static Field class_CraftWorld_environmentField;
+
+    protected static Object class_GenericAttributes_KNOCKBACK_RESISTANCE;
 
     static
     {
@@ -270,6 +280,8 @@ public class NMSUtils {
             class_World = fixBukkitClass("net.minecraft.server.World");
             class_WorldServer = fixBukkitClass("net.minecraft.server.WorldServer");
             class_EnumSkyBlock = (Class<Enum>)fixBukkitClass("net.minecraft.server.EnumSkyBlock");
+            class_EnumSoundCategory = (Class<Enum>)fixBukkitClass("net.minecraft.server.SoundCategory");
+            enum_SoundCategory_PLAYERS = Enum.valueOf(class_EnumSoundCategory, "PLAYERS");
             class_EntityPainting = fixBukkitClass("net.minecraft.server.EntityPainting");
             class_EntityCreature = fixBukkitClass("net.minecraft.server.EntityCreature");
             class_EntityItemFrame = fixBukkitClass("net.minecraft.server.EntityItemFrame");
@@ -293,6 +305,7 @@ public class NMSUtils {
             class_PacketPlayOutSpawnEntityLiving = fixBukkitClass("net.minecraft.server.PacketPlayOutSpawnEntityLiving");
             class_PacketPlayOutEntityMetadata = fixBukkitClass("net.minecraft.server.PacketPlayOutEntityMetadata");
             class_PacketPlayOutEntityStatus = fixBukkitClass("net.minecraft.server.PacketPlayOutEntityStatus");
+            class_PacketPlayOutCustomSoundEffect = fixBukkitClass("net.minecraft.server.PacketPlayOutCustomSoundEffect");
             class_EntityFallingBlock = fixBukkitClass("net.minecraft.server.EntityFallingBlock");
             class_EntityArmorStand = fixBukkitClass("net.minecraft.server.EntityArmorStand");
             class_EntityPlayer = fixBukkitClass("net.minecraft.server.EntityPlayer");
@@ -302,6 +315,9 @@ public class NMSUtils {
             class_CraftChunk = fixBukkitClass("org.bukkit.craftbukkit.CraftChunk");
             class_CraftEntity = fixBukkitClass("org.bukkit.craftbukkit.entity.CraftEntity");
             class_TileEntitySign = fixBukkitClass("net.minecraft.server.TileEntitySign");
+            class_IAttribute = fixBukkitClass("net.minecraft.server.IAttribute");
+            class_AttributeInstance = fixBukkitClass("net.minecraft.server.AttributeInstance");
+            class_GenericAttributes = fixBukkitClass("net.minecraft.server.GenericAttributes");
 
             class_EntityProjectile = NMSUtils.getBukkitClass("net.minecraft.server.EntityProjectile");
             class_EntityFireball = NMSUtils.getBukkitClass("net.minecraft.server.EntityFireball");
@@ -313,7 +329,6 @@ public class NMSUtils {
             class_NBTTagList_getDoubleMethod = class_NBTTagList.getMethod("d", Integer.TYPE);
             class_NBTTagList_sizeMethod = class_NBTTagList.getMethod("size");
             class_NBTTagCompound_setMethod = class_NBTTagCompound.getMethod("set", String.class, class_NBTBase);
-            class_DataWatcher_watchMethod = class_DataWatcher.getMethod("watch", Integer.TYPE, Object.class);
             class_World_getEntitiesMethod = class_World.getMethod("getEntities", class_Entity, class_AxisAlignedBB);
             class_CraftWorld_getTileEntityAtMethod = class_CraftWorld.getMethod("getTileEntityAt", Integer.TYPE, Integer.TYPE, Integer.TYPE);
             class_CraftWorld_spawnMethod = class_CraftWorld.getMethod("spawn", Location.class, Class.class, CreatureSpawnEvent.SpawnReason.class);
@@ -321,7 +336,7 @@ public class NMSUtils {
             class_Entity_setYawPitchMethod = class_Entity.getDeclaredMethod("setYawPitch", Float.TYPE, Float.TYPE);
             class_Entity_setYawPitchMethod.setAccessible(true);
             class_Entity_setSilentMethod = class_Entity.getDeclaredMethod("b", Boolean.TYPE);
-            class_AxisAlignedBB_createBBMethod = class_AxisAlignedBB.getMethod("a", Double.TYPE, Double.TYPE, Double.TYPE, Double.TYPE, Double.TYPE, Double.TYPE);
+            class_AxisAlignedBB_Constructor = class_AxisAlignedBB.getConstructor(Double.TYPE, Double.TYPE, Double.TYPE, Double.TYPE, Double.TYPE, Double.TYPE);
             class_World_explodeMethod = class_World.getMethod("createExplosion", class_Entity, Double.TYPE, Double.TYPE, Double.TYPE, Float.TYPE, Boolean.TYPE, Boolean.TYPE);
             class_NBTTagCompound_setBooleanMethod = class_NBTTagCompound.getMethod("setBoolean", String.class, Boolean.TYPE);
             class_NBTTagCompound_setStringMethod = class_NBTTagCompound.getMethod("setString", String.class, String.class);
@@ -341,11 +356,13 @@ public class NMSUtils {
             class_NBTTagCompound_getMethod = class_NBTTagCompound.getMethod("get", String.class);
             class_NBTTagCompound_getCompoundMethod = class_NBTTagCompound.getMethod("getCompound", String.class);
             class_EntityLiving_damageEntityMethod = class_EntityLiving.getMethod("damageEntity", class_DamageSource, Float.TYPE);
+            class_EntityLiving_getAttributeInstanceMethod = class_EntityLiving.getMethod("getAttributeInstance", class_IAttribute);
+            class_AttributeInstance_getValueMethod = class_AttributeInstance.getMethod("getValue");
+            class_AttributeInstance_setValueMethod = class_AttributeInstance.getMethod("setValue", Double.TYPE);
             class_DamageSource_getMagicSourceMethod = class_DamageSource.getMethod("b", class_Entity, class_Entity);
             class_World_addEntityMethod = class_World.getMethod("addEntity", class_Entity, CreatureSpawnEvent.SpawnReason.class);
             class_NBTCompressedStreamTools_loadFileMethod = class_NBTCompressedStreamTools.getMethod("a", InputStream.class);
             class_TileEntity_loadMethod = class_TileEntity.getMethod("a", class_NBTTagCompound);
-            class_TileEntity_saveMethod = class_TileEntity.getMethod("b", class_NBTTagCompound);
             class_TileEntity_updateMethod = class_TileEntity.getMethod("update");
             class_Entity_setLocationMethod = class_Entity.getMethod("setLocation", Double.TYPE, Double.TYPE, Double.TYPE, Float.TYPE, Float.TYPE);
             class_Entity_getIdMethod = class_Entity.getMethod("getId");
@@ -354,8 +371,6 @@ public class NMSUtils {
             class_ArmorStand_setInvisible = class_EntityArmorStand.getDeclaredMethod("setInvisible", Boolean.TYPE);
             class_ArmorStand_setGravity = class_EntityArmorStand.getDeclaredMethod("setGravity", Boolean.TYPE);
             class_ArmorStand_setSmall = class_EntityArmorStand.getDeclaredMethod("setSmall", Boolean.TYPE);
-            class_ArmorStand_setMarker = class_EntityArmorStand.getDeclaredMethod("n", Boolean.TYPE);
-            class_ArmorStand_setMarker.setAccessible(true);
             class_CraftPlayer_getHandleMethod = class_CraftPlayer.getMethod("getHandle");
             class_CraftChunk_getHandleMethod = class_CraftChunk.getMethod("getHandle");
             class_CraftEntity_getHandleMethod = class_CraftEntity.getMethod("getHandle");
@@ -370,6 +385,7 @@ public class NMSUtils {
             class_PacketPlayOutEntityMetadata_Constructor = class_PacketPlayOutEntityMetadata.getConstructor(Integer.TYPE, class_DataWatcher, Boolean.TYPE);
             class_PacketPlayOutEntityStatus_Constructor = class_PacketPlayOutEntityStatus.getConstructor(class_Entity, Byte.TYPE);
             class_PacketPlayOutEntityDestroy_Constructor = class_PacketPlayOutEntityDestroy.getConstructor(int[].class);
+            class_PacketPlayOutCustomSoundEffect_Constructor = class_PacketPlayOutCustomSoundEffect.getConstructor(String.class, class_EnumSoundCategory, Double.TYPE, Double.TYPE, Double.TYPE, Float.TYPE, Float.TYPE);
 
             class_CraftWorld_environmentField = class_CraftWorld.getDeclaredField("environment");
             class_CraftWorld_environmentField.setAccessible(true);
@@ -394,8 +410,6 @@ public class NMSUtils {
             class_AxisAlignedBB_maxXField = class_AxisAlignedBB.getField("d");
             class_AxisAlignedBB_maxYField = class_AxisAlignedBB.getField("e");
             class_AxisAlignedBB_maxZField = class_AxisAlignedBB.getField("f");
-            class_EntityArmorStand_disabledSlotsField = class_EntityArmorStand.getDeclaredField("bi");
-            class_EntityArmorStand_disabledSlotsField.setAccessible(true);
             class_EntityPlayer_playerConnectionField = class_EntityPlayer.getDeclaredField("playerConnection");
             class_PlayerConnection_floatCountField = class_PlayerConnection.getDeclaredField("g");
             class_PlayerConnection_floatCountField.setAccessible(true);
@@ -427,8 +441,6 @@ public class NMSUtils {
 
             class_TileEntityContainer = fixBukkitClass("net.minecraft.server.TileEntityContainer");
             class_ChestLock = fixBukkitClass("net.minecraft.server.ChestLock");
-            class_TileEntityContainer_setLock = class_TileEntityContainer.getMethod("a", class_ChestLock);
-            class_TileEntityContainer_getLock = class_TileEntityContainer.getMethod("i");
             class_ChestLock_isEmpty = class_ChestLock.getMethod("a");
             class_ChestLock_getString = class_ChestLock.getMethod("b");
             class_Entity_getBoundingBox = class_Entity.getMethod("getBoundingBox");
@@ -464,10 +476,27 @@ public class NMSUtils {
             class_ChestLock_Constructor = class_ChestLock.getConstructor(String.class);
             class_ArmorStand_Constructor = class_EntityArmorStand.getConstructor(class_World);
 
-            class_PacketPlayOutMapChunkBulk = getVersionedBukkitClass("net.minecraft.server.PacketPlayOutMapChunkBulk", "net.minecraft.server.Packet56MapChunkBulk");
-
             try {
-                class_EntityArrow_fromPlayerField = class_EntityArrow.getField("fromPlayer");
+                try {
+                    // 1.9
+                    // class_DataWatcher_watchMethod = class_DataWatcher.getMethod("register", Integer.TYPE, Object.class);
+                    class_TileEntity_saveMethod = class_TileEntity.getMethod("save", class_NBTTagCompound);
+                    class_ArmorStand_setMarker = class_EntityArmorStand.getDeclaredMethod("setMarker", Boolean.TYPE);
+                    class_EntityArmorStand_disabledSlotsField = class_EntityArmorStand.getDeclaredField("bz");
+                    class_TileEntityContainer_setLock = class_TileEntityContainer.getMethod("a", class_ChestLock);
+                    class_TileEntityContainer_getLock = class_TileEntityContainer.getMethod("y_");
+                } catch (Throwable ignore) {
+                    // 1.8 and lower
+                    class_ArmorStand_setMarker = class_EntityArmorStand.getDeclaredMethod("n", Boolean.TYPE);
+                    class_TileEntity_saveMethod = class_TileEntity.getMethod("b", class_NBTTagCompound);
+                    class_DataWatcher_watchMethod = class_DataWatcher.getMethod("watch", Integer.TYPE, Object.class);
+                    class_EntityArmorStand_disabledSlotsField = class_EntityArmorStand.getDeclaredField("bi");
+                    class_TileEntityContainer_setLock = class_TileEntityContainer.getMethod("a", class_ChestLock);
+                    class_TileEntityContainer_getLock = class_TileEntityContainer.getMethod("i");
+                }
+
+                class_ArmorStand_setMarker.setAccessible(true);
+                class_EntityArmorStand_disabledSlotsField.setAccessible(true);
                 class_EntityArrow_damageField = class_EntityArrow.getDeclaredField("damage");
                 class_EntityArrow_damageField.setAccessible(true);
                 // This is kinda hacky, like fer reals :\
@@ -495,6 +524,8 @@ public class NMSUtils {
             {
                 class_EntityArrow_lifeField.setAccessible(true);
             }
+
+            class_GenericAttributes_KNOCKBACK_RESISTANCE = class_GenericAttributes.getDeclaredField("c").get(null);
         }
         catch (Throwable ex) {
             failed = true;

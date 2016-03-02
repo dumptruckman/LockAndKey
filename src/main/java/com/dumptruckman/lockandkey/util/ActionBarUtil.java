@@ -5,10 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package com.dumptruckman.lockandkey.util;
 
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import net.minecraft.server.v1_9_R1.IChatBaseComponent;
+import net.minecraft.server.v1_9_R1.IChatBaseComponent.ChatSerializer;
+import net.minecraft.server.v1_9_R1.PacketPlayOutChat;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;

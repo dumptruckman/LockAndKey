@@ -113,7 +113,7 @@ public class LockListener implements Listener {
             event.setUseInteractedBlock(Event.Result.DENY);
             if (!recentInteract.contains(player)) {
                 NEED_KEY.sendByActionBar(player, lock.getLockMaterial().getItemName());
-                player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ZOMBIE_WOOD, .2F, 1F);
+                player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_DOOR_WOOD, .2F, 1F);
                 if (event.getAction() == Action.PHYSICAL) {
                     recentInteract.add(player);
                     new BukkitRunnable() {
