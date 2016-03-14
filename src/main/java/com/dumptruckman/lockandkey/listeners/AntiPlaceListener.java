@@ -44,22 +44,22 @@ public class AntiPlaceListener implements Listener {
         boolean isLock = ItemHelper.isLockItem(item);
         Block block = event.getBlock();
         Block relative = block.getRelative(BlockFace.NORTH);
-        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
+        if (relative.getType() == Material.CHEST && isLock == (plugin.getLockRegistry().getLock(relative) == null)) {
             event.setCancelled(true);
             return;
         }
         relative = block.getRelative(BlockFace.SOUTH);
-        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
+        if (relative.getType() == Material.CHEST && isLock == (plugin.getLockRegistry().getLock(relative) == null)) {
             event.setCancelled(true);
             return;
         }
         relative = block.getRelative(BlockFace.EAST);
-        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
+        if (relative.getType() == Material.CHEST && isLock == (plugin.getLockRegistry().getLock(relative) == null)) {
             event.setCancelled(true);
             return;
         }
         relative = block.getRelative(BlockFace.WEST);
-        if (relative.getType() == Material.CHEST && isLock && plugin.getLockRegistry().getLock(relative) == null) {
+        if (relative.getType() == Material.CHEST && isLock == (plugin.getLockRegistry().getLock(relative) == null)) {
             event.setCancelled(true);
         }
     }
