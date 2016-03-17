@@ -47,7 +47,11 @@ public enum LockMaterial {
         public boolean isChest() {
             return true;
         }
-    }
+    },
+    FURNACE(Material.FURNACE),
+    HOPPER(Material.HOPPER),
+    DROPPER(Material.DROPPER),
+    DISPENSER(Material.DISPENSER),
     ;
 
     private static final Map<Material, LockMaterial> itemLookupMap = new HashMap<>(LockMaterial.values().length);
@@ -61,11 +65,17 @@ public enum LockMaterial {
 
     @Nullable
     public static LockMaterial getByItemMaterial(@NotNull Material material) {
+        if (material == Material.BURNING_FURNACE) {
+            material = Material.FURNACE;
+        }
         return itemLookupMap.get(material);
     }
 
     @Nullable
     public static LockMaterial getByBlockMaterial(@NotNull Material material) {
+        if (material == Material.BURNING_FURNACE) {
+            material = Material.FURNACE;
+        }
         return blockLookupMap.get(material);
     }
 
