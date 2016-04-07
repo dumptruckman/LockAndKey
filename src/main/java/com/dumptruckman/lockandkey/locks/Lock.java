@@ -8,6 +8,7 @@ package com.dumptruckman.lockandkey.locks;
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.PluginSettings.LockSettings;
 import com.dumptruckman.lockandkey.util.ItemHelper;
+import com.dumptruckman.lockandkey.util.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -121,7 +122,9 @@ public final class Lock {
     }
 
     public boolean isCorrectKeyCode(@Nullable String keyCode) {
-        return this.keyCode != null && this.keyCode.equals(keyCode);
+        boolean ret = this.keyCode != null && !this.keyCode.isEmpty() && this.keyCode.equals(keyCode);
+        Log.finest("Keycode '%s' matches this locks keycode '%s'? %s", keyCode, this.keyCode, ret);
+        return ret;
     }
 
     @Nullable
