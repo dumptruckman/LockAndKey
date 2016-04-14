@@ -7,7 +7,7 @@ package com.dumptruckman.lockandkey.commands;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
 import com.dumptruckman.lockandkey.util.Perms;
-import org.bukkit.ChatColor;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ import static com.dumptruckman.lockandkey.Messages.*;
         aliases = {"givekey"},
         desc = "Gives the player a blank key.",
         usage = "[amount]",
-        flags = "p:",
+        flags = "p:u:",
         min = 0,
         max = 1
 )
@@ -75,10 +75,18 @@ public class GiveKeyCommand extends Command<LockAndKeyPlugin> {
             return false;
         }
 
-        ItemStack lockDust = getPlugin().createBlankKeyItem(amount);
-        player.getInventory().addItem(lockDust);
+        String usesString = context.getFlag('u', "-1");
+        int uses = -1;
+        if (StringUtils.isNumeric(usesString)) {
+            try {
+                uses = Integer.valueOf(usesString);
+            } catch (NumberFormatException ignore) { }
+        }
+
+        ItemStack keyItem = getPlugin().createBlankKeyItem(amount, uses);
+        player.getInventory().addItem(keyItem);
         player.updateInventory();
-        GAVE_ITEM.sendByChat(sender, name, amount, lockDust.getItemMeta().getDisplayName());
+        GAVE_ITEM.sendByChat(sender, name, amount, keyItem.getItemMeta().getDisplayName());
         return true;
     }
 }

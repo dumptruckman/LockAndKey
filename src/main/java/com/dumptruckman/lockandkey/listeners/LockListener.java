@@ -31,6 +31,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
@@ -38,10 +39,13 @@ import org.bukkit.material.PressurePlate;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.dumptruckman.lockandkey.Messages.*;
+import static com.dumptruckman.lockandkey.util.ItemHelper.getKeyUsesRemaining;
 
 public class LockListener implements Listener {
 
@@ -81,7 +85,7 @@ public class LockListener implements Listener {
             return;
         }
 
-        ItemStack itemInHand = player.getItemInHand();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
         if (player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK
                 && ItemHelper.isKeyItem(itemInHand)) {
             fitKey(player, lock, itemInHand);
@@ -124,7 +128,36 @@ public class LockListener implements Listener {
                     }.runTaskLater(plugin, 60L);
                 }
             }
+        } else if (ItemHelper.isKeyItem(itemInHand) && lock.isKeyCompatible(itemInHand)) {
+            int uses = ItemHelper.getKeyUsesRemaining(itemInHand);
+            if (uses > 0) {
+                uses--;
+                ItemHelper.setKeyUsesRemaining(itemInHand, uses);
+                updateKeyLore(itemInHand);
+                if (uses == 0) {
+                    player.getInventory().setItemInMainHand(null);
+                }
+                player.updateInventory();
+            }
         }
+    }
+
+    private void updateKeyLore(@NotNull ItemStack itemStack) {
+        if (!ItemHelper.isKeyItem(itemStack)) {
+            throw new IllegalArgumentException("Item must represent a key.");
+        }
+        ItemMeta meta = itemStack.getItemMeta();
+        List<String> lore = new ArrayList<>(plugin.getLockSettings().getDescriptions().getKeyLore());
+        int uses = ItemHelper.getKeyUsesRemaining(itemStack);
+        if (uses > 0) {
+            lore.add(plugin.getLockSettings().getDescriptions().getKeyUsesLore(uses));
+        }
+        String keyCode = ItemHelper.getKeyCode(itemStack);
+        if (plugin.getLockSettings().isLockCodeVisible()) {
+            lore.add(ChatColor.GRAY.toString() + ChatColor.ITALIC.toString() + keyCode);
+        }
+        meta.setLore(lore);
+        itemStack.setItemMeta(meta);
     }
 
     private void fitKey(@NotNull Player player, @NotNull Lock lock, @NotNull ItemStack itemInHand) {

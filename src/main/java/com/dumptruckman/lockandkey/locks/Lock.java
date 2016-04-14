@@ -165,6 +165,10 @@ public final class Lock {
         }
 
         List<String> lore = new ArrayList<>(getLockSettings().getDescriptions().getKeyLore());
+        int uses = ItemHelper.getKeyUsesRemaining(key);
+        if (uses > 0) {
+            lore.add(getLockSettings().getDescriptions().getKeyUsesLore(uses));
+        }
         if (getLockSettings().isLockCodeVisible()) {
             lore.add(ChatColor.GRAY.toString() + ChatColor.ITALIC.toString() + keyCode);
         }

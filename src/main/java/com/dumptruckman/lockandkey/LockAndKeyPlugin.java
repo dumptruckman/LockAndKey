@@ -23,6 +23,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -170,14 +171,23 @@ public class LockAndKeyPlugin extends JavaPlugin {
                 .buildItem();
     }
 
-    public ItemStack createBlankKeyItem(int amount) {
+    public ItemStack createBlankKeyItem(int amount, int uses) {
+        List<String> lore = getItemDescriptions().getUncutKeyLore();
+        if (uses > 0) {
+            lore.add(getItemDescriptions().getUncutKeyUsesLore(uses));
+        }
         return ItemHelper.builder(Material.TRIPWIRE_HOOK, amount)
                 .setName(ChatColor.GOLD + "Uncut Key")
-                .setLore(getItemDescriptions().getUncutKeyLore())
+                .setLore(lore)
                 .addGlow()
                 .makeUnplaceable()
                 .createKeyData()
+                .setKeyUses(uses)
                 .buildItem();
+    }
+
+    public ItemStack createBlankKeyItem(int amount) {
+        return createBlankKeyItem(amount, -1);
     }
 
     public String createRandomizedKeyCode() {

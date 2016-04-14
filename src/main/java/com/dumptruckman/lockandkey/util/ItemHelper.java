@@ -6,6 +6,7 @@
 package com.dumptruckman.lockandkey.util;
 
 import com.dumptruckman.lockandkey.locks.LockMaterial;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -23,6 +24,7 @@ public class ItemHelper {
     private static final String DUST_NODE_NAME = "isDust";
     private static final String KEY_NODE_NAME = "isKey";
     private static final String KEY_CODE_KEY = "keyCode";
+    private static final String KEY_USES_KEY = "keyUses";
 
     public static ItemHelper builder(@NotNull Material material, int amount) {
         return new ItemHelper(new ItemStack(material, amount), false);
@@ -76,6 +78,34 @@ public class ItemHelper {
             CompatibilityUtils.setMeta(item, KEY_CODE_KEY, keyCode);
         }
         return item;
+    }
+
+    /**
+     * Returns the remaining uses on a key item.
+     *
+     * @param item the item that represents the key.
+     * @return the number of uses remaining. -1 represents unlimited uses or a non-key item.
+     */
+    public static int getKeyUsesRemaining(@NotNull ItemStack item) {
+        if (!isKeyItem(item)) {
+            return -1;
+        }
+        String meta = CompatibilityUtils.getMeta(item, KEY_USES_KEY);
+        if (meta == null || !StringUtils.isNumeric(meta)) {
+            return -1;
+        }
+        try {
+            return Integer.valueOf(meta);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    public static void setKeyUsesRemaining(@NotNull ItemStack item, int uses) {
+        if (!isKeyItem(item)) {
+            return;
+        }
+        CompatibilityUtils.setMeta(item, KEY_USES_KEY, String.valueOf(uses));
     }
 
     private static void createNode(@NotNull ItemStack item, @NotNull String nodeName) {
@@ -151,6 +181,13 @@ public class ItemHelper {
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         //CompatibilityUtils.addGlow(item);
+        return this;
+    }
+
+    public ItemHelper setKeyUses(int uses) {
+        if (uses > 0) {
+            setKeyUsesRemaining(item, uses);
+        }
         return this;
     }
 
