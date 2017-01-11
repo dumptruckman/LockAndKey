@@ -5,10 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package com.dumptruckman.lockandkey.util;
 
-import net.minecraft.server.v1_9_R1.IChatBaseComponent;
-import net.minecraft.server.v1_9_R1.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_9_R1.PacketPlayOutChat;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -31,23 +29,7 @@ public class ActionBarUtil {
      * @param message the message to send.
      */
     public static void sendActionBarMessage(@NotNull Player bukkitPlayer, @NotNull String message) {
-        sendRawActionBarMessage(bukkitPlayer, "{\"text\": \"" + message + "\"}");
-    }
-
-    /**
-     * Sends a raw message (JSON format) to the player's action bar. Note: while the action bar accepts raw messages
-     * it is currently only capable of displaying text.
-     * <p/>
-     * The message will appear above the player's hot bar for 2 seconds and then fade away over 1 second.
-     *
-     * @param bukkitPlayer the player to send the message to.
-     * @param rawMessage the json format message to send.
-     */
-    public static void sendRawActionBarMessage(@NotNull Player bukkitPlayer, @NotNull String rawMessage) {
-        CraftPlayer player = (CraftPlayer) bukkitPlayer;
-        IChatBaseComponent chatBaseComponent = ChatSerializer.a(rawMessage);
-        PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(chatBaseComponent, (byte) 2);
-        player.getHandle().playerConnection.sendPacket(packetPlayOutChat);
+        bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(message).create());
     }
 
     /**
