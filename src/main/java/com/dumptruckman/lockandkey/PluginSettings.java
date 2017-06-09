@@ -115,7 +115,6 @@ public final class PluginSettings extends Settings {
                 uncutKeyLore.add("This key can be cut to fit any lock.");
                 uncutKeyLore.add("Sneak right click the locked block");
                 uncutKeyLore.add("to configure this key for that block.");
-                uncutKeyLore.add("Uses: $uses");
             }
 
             @Comment({"This is the item description of an (cut) Key"})
@@ -123,7 +122,6 @@ public final class PluginSettings extends Settings {
             {
                 keyLore = new ArrayList<>();
                 keyLore.add("This key unlocks something somewhere...");
-                keyLore.add("Uses: $uses");
             }
 
             @Comment({"This shows how many times the key will be able to open a lock once cut"})
@@ -153,6 +151,7 @@ public final class PluginSettings extends Settings {
             }
 
             public String getUncutKeyUsesLore(Integer uses) {
+
                 return uncutKeyUsesLore.replace("$uses", uses.toString());
             }
 
