@@ -69,7 +69,7 @@ public class ItemHelper {
 
     @Nullable
     public static String getKeyCode(@NotNull ItemStack item) {
-        return CompatibilityUtils.getMeta(item, KEY_CODE_KEY);
+        return CompatibilityUtils.getMetaString(item, KEY_CODE_KEY);
     }
 
     public static ItemStack setKeyCode(@NotNull ItemStack item, @Nullable String keyCode) {
@@ -91,7 +91,7 @@ public class ItemHelper {
         if (!isKeyItem(item)) {
             return -1;
         }
-        String meta = CompatibilityUtils.getMeta(item, KEY_USES_KEY);
+        String meta = CompatibilityUtils.getMetaString(item, KEY_USES_KEY);
         if (meta == null || !StringUtils.isNumeric(meta)) {
             return -1;
         }
