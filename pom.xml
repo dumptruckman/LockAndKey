@@ -140,12 +140,17 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.dumptruckman.minecraft.pluginbase:Plugin-Bukkit</include>
+                                    <include>com.elmakers.mine.bukkit:CompatibilityLib</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>pluginbase</pattern>
                                     <shadedPattern>net.net.dawnofages.pluginbase</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.elmakers.mine.bukkit.utility</pattern>
+                                    <shadedPattern>com.dumptruckman.lockandkey.util</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -172,10 +177,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.9-R0.1-SNAPSHOT</version>
-            <type>jar</type>
+            <groupId>com.elmakers.mine.bukkit</groupId>
+            <artifactId>CompatibilityLib</artifactId>
+            <version>7.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 

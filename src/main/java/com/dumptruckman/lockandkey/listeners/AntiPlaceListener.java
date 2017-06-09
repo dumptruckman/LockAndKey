@@ -6,12 +6,11 @@
 package com.dumptruckman.lockandkey.listeners;
 
 import com.dumptruckman.lockandkey.LockAndKeyPlugin;
-import com.dumptruckman.lockandkey.util.CompatibilityUtils;
 import com.dumptruckman.lockandkey.util.ItemHelper;
+import com.elmakers.mine.bukkit.utility.CompatibilityUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;

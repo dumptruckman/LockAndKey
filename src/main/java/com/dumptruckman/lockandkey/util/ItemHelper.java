@@ -6,6 +6,7 @@
 package com.dumptruckman.lockandkey.util;
 
 import com.dumptruckman.lockandkey.locks.LockMaterial;
+import com.elmakers.mine.bukkit.utility.CompatibilityUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
