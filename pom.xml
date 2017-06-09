@@ -146,7 +146,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>pluginbase</pattern>
-                                    <shadedPattern>net.net.dawnofages.pluginbase</shadedPattern>
+                                    <shadedPattern>com.dumptruckman.lockandkey.pluginbase</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.elmakers.mine.bukkit.utility</pattern>
