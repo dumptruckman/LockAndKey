@@ -179,7 +179,7 @@
         <dependency>
             <groupId>com.elmakers.mine.bukkit</groupId>
             <artifactId>CompatibilityLib</artifactId>
-            <version>7.0-SNAPSHOT</version>
+            <version>1.9-1.12-1</version>
             <scope>compile</scope>
         </dependency>
 
