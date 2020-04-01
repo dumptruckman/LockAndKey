@@ -117,7 +117,7 @@ public class LockListener implements Listener {
             event.setUseInteractedBlock(Event.Result.DENY);
             if (!recentInteract.contains(player)) {
                 NEED_KEY.sendByActionBar(player, lock.getLockMaterial().getItemName());
-                player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_DOOR_WOOD, .2F, 1F);
+                player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, .2F, 1F);
                 if (event.getAction() == Action.PHYSICAL) {
                     recentInteract.add(player);
                     new BukkitRunnable() {
@@ -216,8 +216,8 @@ public class LockListener implements Listener {
         if (check instanceof Door
                 || check instanceof Attachable
                 || check instanceof PressurePlate
-                || check.getItemType() == Material.GOLD_PLATE
-                || check.getItemType() == Material.IRON_PLATE) {
+                || check.getItemType() == Material.LIGHT_WEIGHTED_PRESSURE_PLATE
+                || check.getItemType() == Material.HEAVY_WEIGHTED_PRESSURE_PLATE) {
             dropItems(relativeBlock);
             return;
         }

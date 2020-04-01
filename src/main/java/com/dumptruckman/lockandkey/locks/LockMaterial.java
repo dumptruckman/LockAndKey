@@ -16,27 +16,37 @@ import java.util.Map;
 
 public enum LockMaterial {
 
-    WOODEN_DOOR(Material.WOOD_DOOR, Material.WOODEN_DOOR, "Oak Door", true),
-    WOOD_DOOR(Material.WOOD_DOOR, Material.WOODEN_DOOR, "Oak Door", true),
-    OAK_DOOR(Material.WOOD_DOOR, Material.WOODEN_DOOR, "Oak Door", true),
-    IRON_DOOR(Material.IRON_DOOR, Material.IRON_DOOR_BLOCK, "Iron Door", true),
-    ACACIA_DOOR(Material.ACACIA_DOOR_ITEM, Material.ACACIA_DOOR, true),
-    BIRCH_DOOR(Material.BIRCH_DOOR_ITEM, Material.BIRCH_DOOR, true),
-    JUNGLE_DOOR(Material.JUNGLE_DOOR_ITEM, Material.JUNGLE_DOOR, true),
-    SPRUCE_DOOR(Material.SPRUCE_DOOR_ITEM, Material.SPRUCE_DOOR, true),
-    DARK_OAK_DOOR(Material.DARK_OAK_DOOR_ITEM, Material.DARK_OAK_DOOR, true),
-    TRAP_DOOR(Material.TRAP_DOOR, "Wooden Trapdoor"),
-    TRAPDOOR(Material.TRAP_DOOR, "Wooden Trapdoor"),
+    WOODEN_DOOR(Material.OAK_DOOR, true),
+    WOOD_DOOR(Material.OAK_DOOR, true),
+    OAK_DOOR(Material.OAK_DOOR, true),
+    IRON_DOOR(Material.IRON_DOOR, true),
+    ACACIA_DOOR(Material.ACACIA_DOOR, true),
+    BIRCH_DOOR(Material.BIRCH_DOOR, true),
+    JUNGLE_DOOR(Material.JUNGLE_DOOR, true),
+    SPRUCE_DOOR(Material.SPRUCE_DOOR, true),
+    DARK_OAK_DOOR(Material.DARK_OAK_DOOR, true),
+    TRAP_DOOR(Material.OAK_TRAPDOOR),
+    TRAPDOOR(Material.OAK_TRAPDOOR),
     IRON_TRAPDOOR(Material.IRON_TRAPDOOR),
+    ACACIA_TRAPDOOR(Material.ACACIA_TRAPDOOR),
+    BIRCH_TRAPDOOR(Material.BIRCH_TRAPDOOR),
+    JUNGLE_TRAPDOOR(Material.JUNGLE_TRAPDOOR),
+    SPRUCE_TRAPDOOR(Material.SPRUCE_TRAPDOOR),
+    DARK_OAK_TRAPDOOR(Material.DARK_OAK_TRAPDOOR),
     LEVER(Material.LEVER),
-    WOOD_PLATE(Material.WOOD_PLATE, "Wooden Pressure Plate", Action.PHYSICAL),
-    STONE_PLATE(Material.STONE_PLATE, "Stone Pressure Plate", Action.PHYSICAL),
-    IRON_PLATE(Material.IRON_PLATE, "Weighted Pressure Plate (Heavy)", Action.PHYSICAL),
-    GOLD_PLATE(Material.GOLD_PLATE, "Weighted Pressure Plate (Light)", Action.PHYSICAL),
-    WOOD_BUTTON(Material.WOOD_BUTTON, "Button"),
-    STONE_BUTTON(Material.STONE_BUTTON, "Button"),
-    FENCE_GATE(Material.FENCE_GATE, "Oak Fence Gate"),
-    OAK_FENCE_GATE(Material.FENCE_GATE, "Oak Fence Gate"),
+    WOOD_PLATE(Material.OAK_PRESSURE_PLATE, Action.PHYSICAL),
+    STONE_PLATE(Material.STONE_PRESSURE_PLATE, Action.PHYSICAL),
+    IRON_PLATE(Material.HEAVY_WEIGHTED_PRESSURE_PLATE, "Weighted Pressure Plate (Heavy)", Action.PHYSICAL),
+    GOLD_PLATE(Material.LIGHT_WEIGHTED_PRESSURE_PLATE, "Weighted Pressure Plate (Light)", Action.PHYSICAL),
+    WOOD_BUTTON(Material.OAK_BUTTON),
+    STONE_BUTTON(Material.STONE_BUTTON),
+    ACACIA_BUTTON(Material.ACACIA_BUTTON),
+    BIRCH_BUTTON(Material.BIRCH_BUTTON),
+    JUNGLE_BUTTON(Material.JUNGLE_BUTTON),
+    SPRUCE_BUTTON(Material.SPRUCE_BUTTON),
+    DARK_OAK_BUTTON(Material.DARK_OAK_BUTTON),
+    FENCE_GATE(Material.OAK_FENCE_GATE),
+    OAK_FENCE_GATE(Material.OAK_FENCE_GATE),
     ACACIA_FENCE_GATE(Material.ACACIA_FENCE_GATE),
     BIRCH_FENCE_GATE(Material.BIRCH_FENCE_GATE),
     DARK_OAK_FENCE_GATE(Material.DARK_OAK_FENCE_GATE),
@@ -65,17 +75,11 @@ public enum LockMaterial {
 
     @Nullable
     public static LockMaterial getByItemMaterial(@NotNull Material material) {
-        if (material == Material.BURNING_FURNACE) {
-            material = Material.FURNACE;
-        }
         return itemLookupMap.get(material);
     }
 
     @Nullable
     public static LockMaterial getByBlockMaterial(@NotNull Material material) {
-        if (material == Material.BURNING_FURNACE) {
-            material = Material.FURNACE;
-        }
         return blockLookupMap.get(material);
     }
 
@@ -90,6 +94,10 @@ public enum LockMaterial {
 
     LockMaterial(@NotNull Material item) {
         this(item, item, false);
+    }
+
+    LockMaterial(@NotNull Material item, boolean isDoor) {
+        this(item, item, isDoor);
     }
 
     LockMaterial(@NotNull Material item, @NotNull Action action) {
